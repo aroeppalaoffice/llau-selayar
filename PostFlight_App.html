@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Post-Flight Intelligence — UPBU H. Aroeppala Selayar</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #0F2540;
+  --navy2: #1A3A5C;
+  --navy3: #245080;
+  --gold: #E6A817;
+  --gold2: #F5C842;
+  --white: #FFFFFF;
+  --off: #F4F6F9;
+  --muted: #7A8FA6;
+  --border: #D4DCE8;
+  --green: #1D9E75;
+  --red: #E24B4A;
+  --amber: #F59E0B;
+  --wa: #25D366;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:'DM Sans',sans-serif;
+  background:var(--navy);
+  color:var(--white);
+  min-height:100vh;
+}
+
+/* ── HEADER ── */
+.app-header{
+  background:var(--navy);
+  border-bottom:1px solid rgba(255,255,255,0.08);
+  padding:0 1.5rem;
+  display:flex;align-items:center;justify-content:space-between;
+  height:64px;position:sticky;top:0;z-index:100;
+}
+.logo{display:flex;align-items:center;gap:12px}
+.logo-icon{
+  width:38px;height:38px;background:var(--gold);border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--navy);letter-spacing:1px;
+}
+.logo-text{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:var(--white)}
+.logo-sub{font-size:10px;color:var(--muted);letter-spacing:.5px;margin-top:-2px}
+.conn-pill{
+  display:flex;align-items:center;gap:6px;
+  background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);
+  border-radius:20px;padding:6px 12px;font-size:11px;color:var(--muted);cursor:pointer;
+}
+.conn-pill:hover{background:rgba(255,255,255,0.1)}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--amber)}
+.dot.ok{background:var(--green)}
+.dot.err{background:var(--red)}
+
+/* ── TABS ── */
+.tabs{
+  display:flex;gap:0;border-bottom:1px solid rgba(255,255,255,0.08);
+  padding:0 1.5rem;background:var(--navy);overflow-x:auto;
+}
+.tab{
+  padding:14px 20px;font-size:13px;font-weight:500;color:var(--muted);
+  border:none;background:transparent;cursor:pointer;border-bottom:2px solid transparent;
+  white-space:nowrap;transition:all .2s;
+}
+.tab:hover{color:var(--white)}
+.tab.active{color:var(--gold);border-bottom-color:var(--gold)}
+
+/* ── MAIN ── */
+.main{padding:1.5rem;max-width:900px;margin:0 auto}
+.panel{display:none}.panel.active{display:block}
+
+/* ── SECTION CARD ── */
+.scard{
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:14px;padding:1.25rem;margin-bottom:1rem;
+}
+.scard-title{
+  font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--gold);margin-bottom:1rem;display:flex;align-items:center;gap:8px;
+}
+.scard-title::after{content:'';flex:1;height:1px;background:rgba(255,255,255,0.06)}
+
+/* ── FORM ELEMENTS ── */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.full{grid-column:1/-1}
+.fld{display:flex;flex-direction:column;gap:5px}
+.fld label{font-size:11px;font-weight:500;color:var(--muted);letter-spacing:.03em}
+.fld input,.fld select,.fld textarea{
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:8px;padding:9px 12px;
+  font-family:'DM Sans',sans-serif;font-size:13px;color:var(--white);
+  transition:border-color .2s,background .2s;width:100%;
+}
+.fld input:focus,.fld select:focus,.fld textarea:focus{
+  outline:none;border-color:var(--gold);background:rgba(230,168,23,0.06);
+}
+.fld select option{background:var(--navy2);color:var(--white)}
+.fld input[readonly]{opacity:.6;cursor:default}
+.fld textarea{resize:vertical;min-height:60px;line-height:1.5}
+.fld input::placeholder{color:rgba(255,255,255,0.25)}
+
+/* ── STAT CARDS ── */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:1rem}
+.stat{
+  background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);
+  border-radius:10px;padding:12px;text-align:center;
+}
+.stat .n{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--gold);line-height:1}
+.stat .l{font-size:10px;color:var(--muted);margin-top:4px;letter-spacing:.03em}
+
+/* ── BUTTONS ── */
+.btn-row{display:flex;gap:8px;margin-top:1rem;flex-wrap:wrap}
+.btn{
+  flex:1;min-width:120px;padding:11px 16px;border-radius:8px;font-size:13px;font-weight:500;
+  cursor:pointer;border:none;transition:all .15s;font-family:'DM Sans',sans-serif;
+}
+.btn-navy{background:var(--navy2);color:var(--white);border:1px solid rgba(255,255,255,0.15)}
+.btn-navy:hover{background:var(--navy3)}
+.btn-gold{background:var(--gold);color:var(--navy)}
+.btn-gold:hover{background:var(--gold2)}
+.btn-green{background:var(--green);color:var(--white)}
+.btn-green:hover{background:#17846a}
+.btn-wa{background:var(--wa);color:var(--white)}
+.btn-wa:hover{background:#1db954}
+.btn-red{background:var(--red);color:var(--white)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* ── STATUS MESSAGES ── */
+.status-msg{
+  border-radius:8px;padding:10px 14px;font-size:12px;line-height:1.6;
+  margin-top:10px;display:none;white-space:pre-line;
+}
+.status-ok{background:rgba(29,158,117,0.15);border:1px solid rgba(29,158,117,0.3);color:#6ee7b7}
+.status-err{background:rgba(226,75,74,0.15);border:1px solid rgba(226,75,74,0.3);color:#fca5a5}
+.status-loading{background:rgba(230,168,23,0.1);border:1px solid rgba(230,168,23,0.2);color:var(--gold)}
+
+/* ── PREVIEW ── */
+.preview-box{
+  background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.08);
+  border-radius:10px;padding:1rem;font-family:'DM Mono',monospace;font-size:11px;
+  color:rgba(255,255,255,0.75);line-height:1.8;white-space:pre-wrap;
+  max-height:340px;overflow-y:auto;
+}
+.wa-box{
+  background:#0a1a14;border:1px solid rgba(37,211,102,0.2);
+  border-radius:10px;padding:1rem;font-size:12px;
+  color:#ECE5DD;line-height:1.8;white-space:pre-wrap;
+  max-height:340px;overflow-y:auto;font-family:'DM Mono',monospace;
+}
+
+/* ── SETUP STEPS ── */
+.setup-step{
+  display:flex;gap:14px;padding:14px 0;
+  border-bottom:1px solid rgba(255,255,255,0.06);
+}
+.setup-step:last-child{border-bottom:none}
+.step-num{
+  width:28px;height:28px;border-radius:50%;
+  background:var(--gold);color:var(--navy);
+  font-size:12px;font-weight:700;display:flex;align-items:center;
+  justify-content:center;flex-shrink:0;margin-top:2px;
+}
+.step-num.done{background:var(--green)}
+.step-title{font-size:13px;font-weight:600;color:var(--white);margin-bottom:3px}
+.step-desc{font-size:12px;color:var(--muted);line-height:1.6}
+.code-inline{
+  background:rgba(255,255,255,0.08);border-radius:4px;
+  padding:1px 6px;font-family:'DM Mono',monospace;font-size:11px;color:var(--gold2);
+}
+
+/* ── SECTION DIVIDER ── */
+.divider{
+  font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:3px;
+  color:var(--muted);margin:1.25rem 0 .75rem;display:flex;align-items:center;gap:10px;
+}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:rgba(255,255,255,0.06)}
+
+/* ── FONNTE CARD ── */
+.fonnte-card{
+  background:linear-gradient(135deg,rgba(37,211,102,0.08),rgba(37,211,102,0.02));
+  border:1px solid rgba(37,211,102,0.2);border-radius:14px;padding:1.25rem;
+}
+
+/* ── MOBILE ── */
+@media(max-width:600px){
+  .grid2,.grid3,.grid4,.stats{grid-template-columns:1fr 1fr}
+  .grid3{grid-template-columns:1fr 1fr 1fr}
+  .full{grid-column:1/-1}
+  .tabs .tab{padding:12px 14px;font-size:12px}
+  .btn-row{flex-direction:column}
+  .btn{min-width:unset}
+  .stats{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:380px){
+  .grid2{grid-template-columns:1fr}
+  .stats{grid-template-columns:repeat(2,1fr)}
+}
+
+/* ── LOADING SPINNER ── */
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner{
+  width:16px;height:16px;border:2px solid rgba(255,255,255,0.2);
+  border-top-color:var(--gold);border-radius:50%;
+  animation:spin .7s linear infinite;display:inline-block;margin-right:6px;vertical-align:middle;
+}
+
+/* ── CONNECTION MODAL ── */
+.modal-overlay{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);
+  z-index:200;align-items:center;justify-content:center;padding:1rem;
+}
+.modal-overlay.open{display:flex}
+.modal{
+  background:var(--navy2);border:1px solid rgba(255,255,255,0.12);
+  border-radius:16px;padding:1.5rem;width:100%;max-width:500px;
+}
+.modal-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;margin-bottom:.5rem}
+.modal-desc{font-size:12px;color:var(--muted);margin-bottom:1.25rem;line-height:1.6}
+.modal-close{
+  float:right;background:transparent;border:none;color:var(--muted);
+  font-size:20px;cursor:pointer;line-height:1;margin-top:-4px;
+}
+</style>
+</head>
+<body>
+
+<!-- CONNECTION MODAL -->
+<div class="modal-overlay" id="conn-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <div class="modal-title">Koneksi Sistem</div>
+    <div class="modal-desc">Masukkan URL Web App Google Apps Script untuk menghubungkan form ke Google Sheets.</div>
+    <div class="fld" style="margin-bottom:10px">
+      <label>Web App URL</label>
+      <input type="text" id="modal-url" placeholder="https://script.google.com/macros/s/..." />
+    </div>
+    <div class="fld" style="margin-bottom:10px">
+      <label>Nomor WhatsApp Kepala Kantor (628xxx)</label>
+      <input type="text" id="modal-wa" placeholder="628xxxxxxxxx" />
+    </div>
+    <div class="fld" style="margin-bottom:1rem">
+      <label>Token Fonnte (opsional — isi setelah daftar fonnte.com)</label>
+      <input type="text" id="modal-token" placeholder="token dari fonnte.com" />
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-gold" style="flex:1" onclick="saveConfig()">Simpan & Hubungkan</button>
+      <button class="btn btn-navy" onclick="closeModal()">Batal</button>
+    </div>
+    <div id="modal-status" class="status-msg"></div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header class="app-header">
+  <div class="logo">
+    <div class="logo-icon">PFI</div>
+    <div>
+      <div class="logo-text">Post-Flight Intelligence</div>
+      <div class="logo-sub">UPBU Kelas III H. Aroeppala Selayar — Unit LLAU</div>
+    </div>
+  </div>
+  <div class="conn-pill" onclick="openModal()">
+    <div class="dot" id="conn-dot"></div>
+    <span id="conn-label">Konfigurasi</span>
+  </div>
+</header>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('input')">✍ Input Data</button>
+  <button class="tab" onclick="switchTab('laporan')">📄 Laporan</button>
+  <button class="tab" onclick="switchTab('wa')">💬 WhatsApp</button>
+  <button class="tab" onclick="switchTab('setup')">⚙ Setup</button>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+<!-- ═══ TAB: INPUT DATA ═══ -->
+<div id="tab-input" class="panel active">
+
+  <div class="scard">
+    <div class="scard-title">Informasi penerbangan</div>
+    <div class="grid2">
+      <div class="fld"><label>Tanggal</label><input type="date" id="tgl" oninput="onTglChange()"/></div>
+      <div class="fld"><label>Hari</label><input type="text" id="hari" readonly/></div>
+      <div class="fld"><label>Maskapai</label><input type="text" id="maskapai" value="Fly Jaya"/></div>
+      <div class="fld"><label>Operator</label><input type="text" id="operator" value="PT. Surya Mataram Nusantara"/></div>
+      <div class="fld"><label>Registrasi</label><input type="text" id="reg" value="PK-FJA"/></div>
+      <div class="fld"><label>Tipe pesawat</label><input type="text" id="tipe" value="ATR 72-500"/></div>
+      <div class="fld full"><label>Rute</label><input type="text" id="rute" value="UPG-KSR-UPG"/></div>
+    </div>
+  </div>
+
+  <div class="grid2" style="gap:10px">
+    <div class="scard">
+      <div class="scard-title">🛬 Arrival</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div class="grid2">
+          <div class="fld"><label>No flight ARR</label><input type="text" id="flt_arr" value="KS503"/></div>
+          <div class="fld"><label>Route ARR</label><input type="text" id="route_arr" value="UPG"/></div>
+        </div>
+        <div class="grid2">
+          <div class="fld"><label>STA (LT)</label><input type="time" id="sta" value="14:10" oninput="calcDelay()"/></div>
+          <div class="fld"><label>ATA (LT)</label><input type="time" id="ata" value="14:26" oninput="calcDelay()"/></div>
+        </div>
+        <div id="delay-arr-info" style="font-size:11px;color:var(--amber);display:none"></div>
+        <div class="scard-title" style="margin-top:4px">Pax tiba</div>
+        <div class="grid3">
+          <div class="fld"><label>Dewasa</label><input type="number" id="pd" value="44" min="0" oninput="calc()"/></div>
+          <div class="fld"><label>Anak</label><input type="number" id="pa" value="5" min="0" oninput="calc()"/></div>
+          <div class="fld"><label>Bayi</label><input type="number" id="pb" value="2" min="0" oninput="calc()"/></div>
+        </div>
+        <div class="grid2">
+          <div class="fld"><label>Bagasi (kg)</label><input type="number" id="bgs_a" value="328" oninput="calc()"/></div>
+          <div class="fld"><label>Kargo (kg)</label><input type="number" id="cgo_a" value="0" oninput="calc()"/></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="scard">
+      <div class="scard-title">🛫 Departure</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div class="grid2">
+          <div class="fld"><label>No flight DEP</label><input type="text" id="flt_dep" value="KS504"/></div>
+          <div class="fld"><label>Route DEP</label><input type="text" id="route_dep" value="KSR"/></div>
+        </div>
+        <div class="grid2">
+          <div class="fld"><label>STD (LT)</label><input type="time" id="std" value="15:07" oninput="calcDelay()"/></div>
+          <div class="fld"><label>ATD (LT)</label><input type="time" id="atd" value="15:11" oninput="calcDelay()"/></div>
+        </div>
+        <div id="delay-dep-info" style="font-size:11px;color:var(--amber);display:none"></div>
+        <div class="scard-title" style="margin-top:4px">Pax berangkat</div>
+        <div class="grid3">
+          <div class="fld"><label>Dewasa</label><input type="number" id="dd" value="61" min="0" oninput="calc()"/></div>
+          <div class="fld"><label>Anak</label><input type="number" id="da" value="4" min="0" oninput="calc()"/></div>
+          <div class="fld"><label>Bayi</label><input type="number" id="db" value="3" min="0" oninput="calc()"/></div>
+        </div>
+        <div class="grid2">
+          <div class="fld"><label>Bagasi (kg)</label><input type="number" id="bgs_d" value="228" oninput="calc()"/></div>
+          <div class="fld"><label>Kargo (kg)</label><input type="number" id="cgo_d" value="0" oninput="calc()"/></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="n" id="s1">51</div><div class="l">Pax tiba</div></div>
+    <div class="stat"><div class="n" id="s2">68</div><div class="l">Pax berangkat</div></div>
+    <div class="stat"><div class="n" id="s3">556</div><div class="l">Total bagasi (kg)</div></div>
+    <div class="stat"><div class="n" id="s4">119</div><div class="l">Grand total pax</div></div>
+  </div>
+
+  <div class="scard">
+    <div class="scard-title">Keterangan</div>
+    <div class="grid2">
+      <div class="fld">
+        <label>Remark / Status</label>
+        <select id="remark">
+          <option>Regular Flight</option>
+          <option>Extra Flight</option>
+          <option>Charter Flight</option>
+          <option>Delay</option>
+          <option>Cancelled</option>
+        </select>
+      </div>
+      <div class="fld"><label>Petugas jaga</label><input type="text" id="petugas" placeholder="Nama petugas LLAU"/></div>
+      <div class="fld full">
+        <label>Catatan</label>
+        <textarea id="catatan">seluruh aktivitas pelayanan penerbangan telah berjalan dengan lancar dan dilaksanakan sesuai dengan standar operasional yang berlaku.</textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-gold" onclick="submitData()">Simpan ke Sheets</button>
+    <button class="btn btn-green" onclick="goLaporan()">Lihat Laporan</button>
+    <button class="btn btn-wa" onclick="goWA()">Kirim WhatsApp</button>
+  </div>
+  <div id="submit-status" class="status-msg"></div>
+</div>
+
+<!-- ═══ TAB: LAPORAN ═══ -->
+<div id="tab-laporan" class="panel">
+  <div class="scard">
+    <div class="scard-title">Preview laporan penerbangan harian</div>
+    <div class="preview-box" id="preview-text">Generate laporan dari tab Input Data.</div>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-gold" onclick="generateAll()">Generate Preview</button>
+    <button class="btn btn-navy" onclick="copyPreview()">Salin Teks</button>
+    <button class="btn btn-green" onclick="printLaporan()">Cetak / Save PDF</button>
+  </div>
+</div>
+
+<!-- ═══ TAB: WHATSAPP ═══ -->
+<div id="tab-wa" class="panel">
+  <div class="scard">
+    <div class="scard-title">Nomor tujuan</div>
+    <div class="grid2">
+      <div class="fld"><label>Kepala Kantor (Bpk. Hery Sugianto)</label><input type="text" id="wa-kakan" placeholder="628xxxxxxxxx"/></div>
+      <div class="fld"><label>Nomor lain (opsional)</label><input type="text" id="wa-other" placeholder="628xxxxxxxxx"/></div>
+    </div>
+  </div>
+  <div class="scard">
+    <div class="scard-title">Preview pesan WhatsApp</div>
+    <div class="wa-box" id="wa-text">Generate dari tab Input Data terlebih dahulu.</div>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-wa" onclick="kirimWA(1)">Kirim ke Kepala Kantor</button>
+    <button class="btn btn-wa" onclick="kirimWA(2)">Kirim ke Nomor Lain</button>
+    <button class="btn btn-navy" onclick="copyWA()">Salin Pesan</button>
+  </div>
+</div>
+
+<!-- ═══ TAB: SETUP ═══ -->
+<div id="tab-setup" class="panel">
+
+  <div class="scard">
+    <div class="scard-title">Status sistem</div>
+    <div class="setup-step">
+      <div class="step-num done">✓</div>
+      <div><div class="step-title">Google Sheets — selesai</div><div class="step-desc">Template xlsx sudah diupload dan sheet Data Harian, Rekap Bulanan, Log Aktivitas sudah dibuat via setupSheets().</div></div>
+    </div>
+    <div class="setup-step">
+      <div class="step-num done">✓</div>
+      <div><div class="step-title">Apps Script — deployed</div><div class="step-desc">Web App sudah live. GET request berhasil mengembalikan data rekap dari Sheets.</div></div>
+    </div>
+    <div class="setup-step">
+      <div class="step-num" id="step3-num">3</div>
+      <div><div class="step-title">Web App URL — <span id="step3-status" style="color:var(--amber)">belum diisi</span></div>
+      <div class="step-desc">Klik tombol <span class="code-inline">Konfigurasi</span> di pojok kanan atas untuk paste URL Web App kamu.</div>
+      <button class="btn btn-gold" style="margin-top:10px;flex:0;padding:8px 16px" onclick="openModal()">Isi URL Sekarang</button>
+      </div>
+    </div>
+    <div class="setup-step">
+      <div class="step-num" id="step4-num">4</div>
+      <div><div class="step-title">WhatsApp Fonnte — <span id="step4-status" style="color:var(--amber)">belum dikonfigurasi</span></div>
+      <div class="step-desc">Ikuti panduan di bawah untuk aktivasi notifikasi WA otomatis.</div></div>
+    </div>
+  </div>
+
+  <div class="fonnte-card" style="margin-bottom:1rem">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:1rem">
+      <div style="width:36px;height:36px;background:var(--wa);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px">💬</div>
+      <div>
+        <div style="font-weight:600;font-size:14px">Setup WhatsApp — Fonnte Gateway</div>
+        <div style="font-size:11px;color:var(--muted)">Gateway WA Indonesia, mulai gratis</div>
+      </div>
+    </div>
+    <div class="setup-step" style="border-color:rgba(37,211,102,0.1)">
+      <div class="step-num" style="background:var(--wa);color:#fff;font-size:11px">1</div>
+      <div><div class="step-title">Daftar di Fonnte</div>
+      <div class="step-desc">Buka fonnte.com → daftar akun → verifikasi nomor WhatsApp yang akan digunakan untuk kirim laporan (bisa nomor kantor atau nomor kamu).</div>
+      <button class="btn btn-wa" style="margin-top:8px;flex:0;padding:7px 14px;font-size:12px" onclick="window.open('https://fonnte.com','_blank')">Buka Fonnte.com</button>
+      </div>
+    </div>
+    <div class="setup-step" style="border-color:rgba(37,211,102,0.1)">
+      <div class="step-num" style="background:var(--wa);color:#fff;font-size:11px">2</div>
+      <div><div class="step-title">Dapatkan Token API</div>
+      <div class="step-desc">Di dashboard Fonnte → menu <span class="code-inline">Device</span> → salin token yang tersedia. Token ini yang dimasukkan ke Apps Script dan form ini.</div></div>
+    </div>
+    <div class="setup-step" style="border-color:rgba(37,211,102,0.1)">
+      <div class="step-num" style="background:var(--wa);color:#fff;font-size:11px">3</div>
+      <div><div class="step-title">Update Apps Script</div>
+      <div class="step-desc">Di Apps Script, pada bagian <span class="code-inline">CONFIG</span>, ganti:<br>
+      <span class="code-inline">WA_TOKEN : "token_fonnte_kamu"</span><br>
+      <span class="code-inline">WA_KAKAN : "628nomor_kepala_kantor"</span><br>
+      Simpan → Deploy ulang (versi baru).</div></div>
+    </div>
+    <div class="setup-step" style="border-color:rgba(37,211,102,0.1);border-bottom:none">
+      <div class="step-num" style="background:var(--wa);color:#fff;font-size:11px">4</div>
+      <div><div class="step-title">Isi token di form ini</div>
+      <div class="step-desc">Klik <span class="code-inline">Konfigurasi</span> di pojok kanan atas → isi Token Fonnte dan Nomor Kepala Kantor → Simpan. Notifikasi WA akan aktif otomatis setiap kali data disimpan.</div></div>
+    </div>
+  </div>
+
+  <div class="scard">
+    <div class="scard-title">Info aplikasi</div>
+    <div style="font-size:12px;color:var(--muted);line-height:2">
+      Versi : 1.0 — April 2026<br>
+      Unit  : LLAU — UPBU Kelas III H. Aroeppala Selayar<br>
+      Dibuat dalam rangka Aktualisasi Latsar CPNS Gelombang I Angkatan I Tahun 2026<br>
+      Kontak: aroeppalaairport@gmail.com | 0852-2034-8115
+    </div>
+  </div>
+</div>
+
+</div><!-- /main -->
+
+<script>
+// ─── CONFIG & STATE ────────────────────────────────────────────
+const CFG = {
+  webAppUrl : localStorage.getItem('pfi_url') || '',
+  waKakan   : localStorage.getItem('pfi_wa') || '',
+  waToken   : localStorage.getItem('pfi_token') || '',
+};
+
+const HARI_NAMES  = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+const BULAN_NAMES = ['Januari','Februari','Maret','April','Mei','Juni',
+                     'Juli','Agustus','September','Oktober','November','Desember'];
+
+// ─── INIT ──────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('tgl').value = today;
+  onTglChange();
+  calc();
+  updateConnStatus();
+
+  // Prefill WA dari config
+  if (CFG.waKakan) document.getElementById('wa-kakan').value = CFG.waKakan;
+
+  // Auto-open modal jika belum ada URL
+  if (!CFG.webAppUrl) setTimeout(openModal, 600);
+});
+
+// ─── HELPERS ───────────────────────────────────────────────────
+const v   = id => document.getElementById(id)?.value || '';
+const n   = id => parseInt(document.getElementById(id)?.value) || 0;
+const el  = id => document.getElementById(id);
+
+function formatTgl(d) {
+  if (!d) return '';
+  const dt = new Date(d + 'T00:00:00');
+  return `${dt.getDate()} ${BULAN_NAMES[dt.getMonth()]} ${dt.getFullYear()}`;
+}
+
+function hitungDelay(s, a) {
+  if (!s || !a) return 0;
+  const [sh,sm] = s.split(':').map(Number);
+  const [ah,am] = a.split(':').map(Number);
+  return Math.max(0, (ah*60+am) - (sh*60+sm));
+}
+
+function showStatus(id, type, msg) {
+  const e = el(id);
+  if (!e) return;
+  e.style.display = 'block';
+  e.className = 'status-msg status-' + type;
+  e.textContent = msg;
+}
+
+// ─── FORM LOGIC ────────────────────────────────────────────────
+function onTglChange() {
+  const tgl = v('tgl');
+  if (!tgl) return;
+  const dt = new Date(tgl + 'T00:00:00');
+  el('hari').value = HARI_NAMES[dt.getDay()];
+  calc();
+}
+
+function calc() {
+  const arrT = n('pd') + n('pa') + n('pb');
+  const depT = n('dd') + n('da') + n('db');
+  el('s1').textContent = arrT;
+  el('s2').textContent = depT;
+  el('s3').textContent = n('bgs_a') + n('bgs_d');
+  el('s4').textContent = arrT + depT;
+}
+
+function calcDelay() {
+  calc();
+  const dA = hitungDelay(v('sta'), v('ata'));
+  const dD = hitungDelay(v('std'), v('atd'));
+  const eA = el('delay-arr-info');
+  const eD = el('delay-dep-info');
+  if (dA > 0) { eA.style.display='block'; eA.textContent=`⚠ Delay ARR: ${dA} menit`; }
+  else eA.style.display='none';
+  if (dD > 0) { eD.style.display='block'; eD.textContent=`⚠ Delay DEP: ${dD} menit`; }
+  else eD.style.display='none';
+}
+
+// ─── BUILD DATA ────────────────────────────────────────────────
+function buildPayload() {
+  return {
+    tanggal   : v('tgl'), hari: v('hari'),
+    maskapai  : v('maskapai'), operator: v('operator'),
+    reg       : v('reg'), tipe: v('tipe'), rute: v('rute'),
+    flt_arr   : v('flt_arr'), flt_dep: v('flt_dep'),
+    route_arr : v('route_arr'), route_dep: v('route_dep'),
+    sta: v('sta'), ata: v('ata'), std: v('std'), atd: v('atd'),
+    pax_arr_d : n('pd'), pax_arr_a: n('pa'), pax_arr_b: n('pb'),
+    pax_dep_d : n('dd'), pax_dep_a: n('da'), pax_dep_b: n('db'),
+    bgs_arr   : n('bgs_a'), cgo_arr: n('cgo_a'),
+    bgs_dep   : n('bgs_d'), cgo_dep: n('cgo_d'),
+    remark    : v('remark'), catatan: v('catatan'), petugas: v('petugas'),
+    wa_number : CFG.waKakan,
+  };
+}
+
+function buildLaporan() {
+  const d = buildPayload();
+  const tgl = formatTgl(d.tanggal);
+  const arrT = d.pax_arr_d + d.pax_arr_a + d.pax_arr_b;
+  const depT = d.pax_dep_d + d.pax_dep_a + d.pax_dep_b;
+  return `LAPORAN PENERBANGAN HARIAN
+KANTOR UPBU H. AROEPPALA SELAYAR
+${d.hari}, ${tgl}
+
+Kepada Yth.
+Dirjen Perhubungan Udara • Sesditjen Perhubungan Udara
+Direktur Bandar Udara • Direktur Angkutan Udara
+Kepala Kantor OBU Wilayah V Makassar
+
+Dengan hormat, disampaikan laporan ${d.remark} ${d.maskapai}
+Rute ${d.rute} pada hari ${d.hari}, ${tgl} di Bandar Udara H. Aroeppala Selayar.
+
+OPERATOR : ${d.operator}
+Flt No   : ${d.flt_arr} - ${d.flt_dep}
+Reg      : ${d.reg}
+Type     : ${d.tipe}
+Opr      : ${d.maskapai}
+Rute     : ${d.rute}
+
+--- ARRIVAL (${d.flt_arr}) ---
+Route ARR  : ${d.route_arr}
+STA / ATA  : ${d.sta} / ${d.ata} LT
+Pax Tiba   : ${d.pax_arr_d}/${d.pax_arr_a}/${d.pax_arr_b} = ${arrT} Org
+Bagasi     : ${d.bgs_arr} KG
+Kargo      : ${d.cgo_arr === 0 ? 'NIL' : d.cgo_arr + ' KG'}
+
+--- DEPARTURE (${d.flt_dep}) ---
+Route DEP  : ${d.route_dep}
+STD / ATD  : ${d.std} / ${d.atd} LT
+Pax Brgkt  : ${d.pax_dep_d}/${d.pax_dep_a}/${d.pax_dep_b} = ${depT} Org
+Bagasi     : ${d.bgs_dep} KG
+Kargo      : ${d.cgo_dep === 0 ? 'NIL' : d.cgo_dep + ' KG'}
+
+--- REKAPITULASI ---
+Total Pax Arrival    : ${arrT} Org
+Total Pax Departure  : ${depT} Org
+Grand Total Pax      : ${arrT + depT} Org
+Total Bagasi         : ${d.bgs_arr + d.bgs_dep} KG
+Total Kargo          : ${d.cgo_arr + d.cgo_dep === 0 ? 'NIL' : (d.cgo_arr + d.cgo_dep) + ' KG'}
+Status               : ${d.remark}
+
+Catatan:
+${d.catatan}
+
+Kegiatan berjalan aman dan lancar.
+Demikian dilaporkan, terima kasih.
+
+Hormat kami,
+Kepala UPBU H. Aroeppala Selayar`;
+}
+
+function buildWAMsg() {
+  const d = buildPayload();
+  const tgl = formatTgl(d.tanggal);
+  const arrT = d.pax_arr_d + d.pax_arr_a + d.pax_arr_b;
+  const depT = d.pax_dep_d + d.pax_dep_a + d.pax_dep_b;
+  const dA = hitungDelay(d.sta, d.ata);
+  const dD = hitungDelay(d.std, d.atd);
+  return `✈️ *LAPORAN PENERBANGAN HARIAN*
+*UPBU H. Aroeppala Selayar*
+📅 ${d.hari}, ${tgl}
+
+*${d.maskapai} — ${d.flt_arr}/${d.flt_dep}*
+🛩 ${d.tipe} | ${d.reg}
+🗺 Rute: ${d.rute}
+
+━━━━━━━━━━━━━━━
+🛬 *ARRIVAL* (${d.flt_arr})
+• STA/ATA: ${d.sta}/${d.ata} LT${dA > 0 ? ` _(delay ${dA} mnt)_` : ' ✅'}
+• Pax: ${arrT} Org (D:${d.pax_arr_d} A:${d.pax_arr_a} B:${d.pax_arr_b})
+• Bagasi: ${d.bgs_arr} kg | Kargo: ${d.cgo_arr === 0 ? 'NIL' : d.cgo_arr + ' kg'}
+
+🛫 *DEPARTURE* (${d.flt_dep})
+• STD/ATD: ${d.std}/${d.atd} LT${dD > 0 ? ` _(delay ${dD} mnt)_` : ' ✅'}
+• Pax: ${depT} Org (D:${d.pax_dep_d} A:${d.pax_dep_a} B:${d.pax_dep_b})
+• Bagasi: ${d.bgs_dep} kg | Kargo: ${d.cgo_dep === 0 ? 'NIL' : d.cgo_dep + ' kg'}
+
+━━━━━━━━━━━━━━━
+📊 *REKAPITULASI*
+• Grand Total Pax : ${arrT + depT} Org
+• Total Bagasi    : ${d.bgs_arr + d.bgs_dep} kg
+• Status          : ${d.remark} ✅
+
+📝 _${d.catatan}_
+
+_Dilaporkan oleh: ${d.petugas || 'Unit LLAU'}_
+_UPBU Kelas III H. Aroeppala Selayar_`;
+}
+
+// ─── SUBMIT KE SHEETS ──────────────────────────────────────────
+async function submitData() {
+  calc();
+  const payload = buildPayload();
+
+  // Validasi
+  if (!payload.tanggal) { showStatus('submit-status','err','Tanggal wajib diisi.'); return; }
+  if (!payload.flt_arr || !payload.flt_dep) { showStatus('submit-status','err','Nomor flight ARR/DEP wajib diisi.'); return; }
+
+  // Update preview & WA dulu
+  el('preview-text').textContent = buildLaporan();
+  el('wa-text').textContent = buildWAMsg();
+
+  if (!CFG.webAppUrl) {
+    showStatus('submit-status','err','URL Web App belum diisi. Klik "Konfigurasi" di pojok kanan atas.');
+    return;
+  }
+
+  showStatus('submit-status','loading','⏳ Mengirim data ke Google Sheets...');
+
+  try {
+    // Gunakan no-cors untuk hindari CORS issue
+    const resp = await fetch(CFG.webAppUrl, {
+      method  : 'POST',
+      mode    : 'no-cors',
+      headers : {'Content-Type':'text/plain'},
+      body    : JSON.stringify(payload),
+    });
+
+    // no-cors selalu return opaque — anggap berhasil jika tidak throw
+    showStatus('submit-status','ok',
+      `✅ Data terkirim ke Google Sheets!\n` +
+      `Tanggal: ${payload.hari}, ${formatTgl(payload.tanggal)}\n` +
+      `Flight: ${payload.flt_arr}/${payload.flt_dep} | ` +
+      `Pax: ${payload.pax_arr_d+payload.pax_arr_a+payload.pax_arr_b + payload.pax_dep_d+payload.pax_dep_a+payload.pax_dep_b} org\n` +
+      `Buka Google Sheets untuk konfirmasi data masuk.`
+    );
+
+  } catch(err) {
+    showStatus('submit-status','err','Gagal mengirim: ' + err.message);
+  }
+}
+
+// ─── NAVIGATION ────────────────────────────────────────────────
+function switchTab(t) {
+  ['input','laporan','wa','setup'].forEach(id => {
+    el('tab-'+id)?.classList.toggle('active', id===t);
+  });
+  document.querySelectorAll('.tab').forEach((b,i) => {
+    b.classList.toggle('active', ['input','laporan','wa','setup'][i]===t);
+  });
+}
+
+function generateAll() {
+  calc(); calcDelay();
+  el('preview-text').textContent = buildLaporan();
+  el('wa-text').textContent = buildWAMsg();
+}
+
+function goLaporan() { generateAll(); switchTab('laporan'); }
+function goWA()      { generateAll(); switchTab('wa'); }
+
+function copyPreview() {
+  navigator.clipboard.writeText(el('preview-text').textContent)
+    .then(() => alert('Teks laporan berhasil disalin!'));
+}
+
+function copyWA() {
+  navigator.clipboard.writeText(el('wa-text').textContent)
+    .then(() => alert('Pesan WhatsApp berhasil disalin!'));
+}
+
+function printLaporan() {
+  const w = window.open('','_blank');
+  w.document.write(`<pre style="font-family:monospace;font-size:12px;padding:2rem">${el('preview-text').textContent}</pre>`);
+  w.print();
+}
+
+function kirimWA(which) {
+  const txt = el('wa-text').textContent || buildWAMsg();
+  const num = (which===1 ? v('wa-kakan') : v('wa-other')).replace(/\D/g,'');
+  if (!num) {
+    navigator.clipboard.writeText(txt).then(() =>
+      alert('Nomor belum diisi. Pesan WA sudah disalin — buka WhatsApp manual.')
+    );
+    return;
+  }
+  window.open(`https://wa.me/${num}?text=${encodeURIComponent(txt)}`, '_blank');
+}
+
+// ─── MODAL / CONFIG ────────────────────────────────────────────
+function openModal() {
+  el('modal-url').value = CFG.webAppUrl;
+  el('modal-wa').value  = CFG.waKakan;
+  el('modal-token').value = CFG.waToken;
+  el('conn-modal').classList.add('open');
+}
+function closeModal() { el('conn-modal').classList.remove('open'); }
+
+async function saveConfig() {
+  const url   = el('modal-url').value.trim();
+  const wa    = el('modal-wa').value.trim();
+  const token = el('modal-token').value.trim();
+
+  if (url && !url.startsWith('https://script.google.com')) {
+    showStatus('modal-status','err','URL tidak valid. Harus dimulai dengan https://script.google.com/...');
+    return;
+  }
+
+  showStatus('modal-status','loading','Memeriksa koneksi...');
+
+  if (url) {
+    try {
+      const r = await fetch(url + '?action=rekap');
+      const j = await r.json();
+      if (j.status !== 'ok') throw new Error(j.msg);
+      showStatus('modal-status','ok',`✅ Terhubung! ${j.total_flight} penerbangan di Sheets.`);
+    } catch(e) {
+      showStatus('modal-status','err','Koneksi gagal: ' + e.message + '\nPastikan URL benar dan Web App sudah di-deploy.');
+      return;
+    }
+  }
+
+  CFG.webAppUrl = url;
+  CFG.waKakan   = wa;
+  CFG.waToken   = token;
+  localStorage.setItem('pfi_url',   url);
+  localStorage.setItem('pfi_wa',    wa);
+  localStorage.setItem('pfi_token', token);
+
+  if (wa) document.getElementById('wa-kakan').value = wa;
+  updateConnStatus();
+
+  setTimeout(closeModal, 1200);
+}
+
+function updateConnStatus() {
+  const dot   = el('conn-dot');
+  const label = el('conn-label');
+  const s3num = el('step3-num');
+  const s3st  = el('step3-status');
+  const s4st  = el('step4-status');
+
+  if (CFG.webAppUrl) {
+    dot.className = 'dot ok';
+    label.textContent = 'Terhubung';
+    if (s3num) { s3num.classList.add('done'); s3num.textContent = '✓'; }
+    if (s3st)  s3st.innerHTML = '<span style="color:var(--green)">tersimpan ✓</span>';
+  }
+  if (CFG.waToken) {
+    if (s4st) s4st.innerHTML = '<span style="color:var(--green)">aktif ✓</span>';
+  }
+}
+</script>
+</body>
+</html>
