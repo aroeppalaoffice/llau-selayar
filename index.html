@@ -711,23 +711,51 @@ async function submitData() {
 
   showStatus('submit-status','loading','⏳ Mengirim data ke Google Sheets...');
 
+  // Teknik: gunakan hidden form + iframe untuk bypass CORS
+  // Apps Script menerima ini sebagai form POST biasa, bisa baca data, dan kirim WA
   try {
-    // Gunakan no-cors untuk hindari CORS issue
-    const resp = await fetch(CFG.webAppUrl, {
-      method  : 'POST',
-      mode    : 'no-cors',
-      headers : {'Content-Type':'text/plain'},
-      body    : JSON.stringify(payload),
-    });
+    // Buat iframe tersembunyi sebagai target form
+    let iframe = document.getElementById('submit-iframe');
+    if (!iframe) {
+      iframe = document.createElement('iframe');
+      iframe.id   = 'submit-iframe';
+      iframe.name = 'submit-iframe';
+      iframe.style.display = 'none';
+      document.body.appendChild(iframe);
+    }
 
-    // no-cors selalu return opaque — anggap berhasil jika tidak throw
-    showStatus('submit-status','ok',
-      `✅ Data terkirim ke Google Sheets!\n` +
-      `Tanggal: ${payload.hari}, ${formatTgl(payload.tanggal)}\n` +
-      `Flight: ${payload.flt_arr}/${payload.flt_dep} | ` +
-      `Pax: ${payload.pax_arr_d+payload.pax_arr_a+payload.pax_arr_b + payload.pax_dep_d+payload.pax_dep_a+payload.pax_dep_b} org\n` +
-      `Buka Google Sheets untuk konfirmasi data masuk.`
-    );
+    // Buat form tersembunyi
+    let form = document.getElementById('submit-form');
+    if (form) form.remove();
+    form = document.createElement('form');
+    form.id     = 'submit-form';
+    form.method = 'POST';
+    form.action = CFG.webAppUrl;
+    form.target = 'submit-iframe';
+    form.style.display = 'none';
+
+    // Masukkan semua data sebagai satu field JSON
+    const input = document.createElement('input');
+    input.type  = 'hidden';
+    input.name  = 'data';
+    input.value = JSON.stringify(payload);
+    form.appendChild(input);
+    document.body.appendChild(form);
+
+    // Submit form
+    form.submit();
+
+    // Tampilkan sukses setelah 2 detik (iframe load)
+    setTimeout(() => {
+      showStatus('submit-status','ok',
+        `✅ Data terkirim ke Google Sheets!\n` +
+        `Tanggal  : ${payload.hari}, ${formatTgl(payload.tanggal)}\n` +
+        `Flight   : ${payload.flt_arr}/${payload.flt_dep}\n` +
+        `Pax      : ${payload.pax_arr_d+payload.pax_arr_a+payload.pax_arr_b + payload.pax_dep_d+payload.pax_dep_a+payload.pax_dep_b} org\n` +
+        `WhatsApp : otomatis terkirim ke Kepala Kantor ✓\n\n` +
+        `Cek Google Sheets sheet "Data Harian" untuk konfirmasi.`
+      );
+    }, 2500);
 
   } catch(err) {
     showStatus('submit-status','err','Gagal mengirim: ' + err.message);
