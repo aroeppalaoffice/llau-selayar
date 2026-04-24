@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Generator Laporan PDF — UPBU H. Aroeppala Selayar</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
 <style>
 /* ══════════════════════════════════════════
@@ -196,9 +197,14 @@ table.ptbl tr:nth-child(even) td{background:#F8F9FB}
       <label style="font-size:11px;color:rgba(255,255,255,.45)">Web App URL (Google Apps Script)</label>
       <input id="cfg-url" type="text" placeholder="https://script.google.com/macros/s/..." style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);border-radius:7px;padding:8px 11px;font-size:12px;color:#fff;width:100%"/>
     </div>
-    <div style="display:flex;flex-direction:column;gap:4px;margin-bottom:1.1rem">
+    <div style="display:flex;flex-direction:column;gap:4px;margin-bottom:10px">
       <label style="font-size:11px;color:rgba(255,255,255,.45)">Nomor WhatsApp Kepala Kantor (628xxx)</label>
       <input id="cfg-wa" type="text" placeholder="628xxxxxxxxx" style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);border-radius:7px;padding:8px 11px;font-size:12px;color:#fff;width:100%"/>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:4px;margin-bottom:1.1rem">
+      <label style="font-size:11px;color:rgba(255,255,255,.45)">Token Fonnte (untuk kirim gambar WA)</label>
+      <input id="cfg-token" type="text" placeholder="token dari fonnte.com" style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);border-radius:7px;padding:8px 11px;font-size:12px;color:#fff;width:100%"/>
+      <div style="font-size:10px;color:rgba(255,255,255,.3);margin-top:2px">Token ini untuk kirim screenshot laporan sebagai gambar WA otomatis</div>
     </div>
     <div style="display:flex;gap:8px">
       <button onclick="saveConfig()" style="flex:1;padding:10px;background:#E6A817;color:#0F2540;border:none;border-radius:7px;font-weight:600;cursor:pointer;font-size:13px">Simpan</button>
@@ -464,8 +470,9 @@ const n  = id => parseInt(document.getElementById(id)?.value) || 0;
 const el = id => document.getElementById(id);
 
 const CFG = {
-  webAppUrl : localStorage.getItem('pfi_url') || '',
-  waKakan   : localStorage.getItem('pfi_wa')  || '',
+  webAppUrl : localStorage.getItem('pfi_url')   || '',
+  waKakan   : localStorage.getItem('pfi_wa')    || '',
+  waToken   : localStorage.getItem('pfi_token') || '',
 };
 
 function formatTgl(d) {
@@ -534,12 +541,14 @@ function removePhoto(i) {
 }
 
 function saveConfig() {
-  const url = el('cfg-url').value.trim();
-  const wa  = el('cfg-wa').value.trim();
+  const url   = el('cfg-url').value.trim();
+  const wa    = el('cfg-wa').value.trim();
+  const token = el('cfg-token') ? el('cfg-token').value.trim() : '';
   if (!url) { showNotif('URL Web App wajib diisi!', 'err'); return; }
-  CFG.webAppUrl = url; CFG.waKakan = wa;
-  localStorage.setItem('pfi_url', url);
-  localStorage.setItem('pfi_wa',  wa);
+  CFG.webAppUrl = url; CFG.waKakan = wa; CFG.waToken = token;
+  localStorage.setItem('pfi_url',   url);
+  localStorage.setItem('pfi_wa',    wa);
+  localStorage.setItem('pfi_token', token);
   el('cfg-modal').style.display = 'none';
   updateCfgStatus();
   showNotif('Konfigurasi tersimpan!', 'ok');
@@ -551,6 +560,7 @@ function updateCfgStatus() {
   else               { dot.style.background='#F59E0B'; lbl.textContent='Konfigurasi'; }
   el('cfg-url').value = CFG.webAppUrl;
   el('cfg-wa').value  = CFG.waKakan;
+  if (el('cfg-token')) el('cfg-token').value = CFG.waToken;
 }
 
 function kirimWAOtomatis(payload) {
@@ -651,19 +661,91 @@ function previewPDF() {
   window.scrollTo(0,0);
 }
 
-function generateAndPrint() {
-  if (!v('tgl')) { showNotif('Tanggal wajib diisi!','err'); return; }
+async function generateAndPrint() {
+  if (!v('tgl')) { showNotif('Tanggal wajib diisi!', 'err'); return; }
+
+  // 1. Build PDF page
   buildPDF();
-  // Kirim WA + simpan ke Sheets otomatis bersamaan
+  el('pdf-wrap').style.display = 'block';
+  el('screen').style.display  = 'none';
+  window.scrollTo(0, 0);
+
+  // 2. Kirim teks WA + simpan Sheets dulu (tidak tunggu screenshot)
   if (CFG.webAppUrl) {
     kirimWAOtomatis(buildPayload());
-    showNotif('Data tersimpan & WA terkirim ke Kepala Kantor!','ok');
-  } else {
-    showNotif('Isi konfigurasi dulu agar WA terkirim otomatis','err');
   }
-  el('pdf-wrap').style.display='block';
-  el('screen').style.display='none';
-  setTimeout(() => window.print(), 700);
+
+  // 3. Screenshot halaman PDF → kirim sebagai gambar WA
+  if (CFG.webAppUrl && CFG.waKakan && CFG.waToken) {
+    showNotif('⏳ Membuat screenshot laporan...', 'ok');
+    try {
+      await new Promise(r => setTimeout(r, 800)); // tunggu render selesai
+      const pdfEl = el('pdf-page');
+      const canvas = await html2canvas(pdfEl, {
+        scale      : 2,
+        useCORS    : true,
+        allowTaint : true,
+        backgroundColor: '#ffffff',
+        logging    : false,
+        windowWidth: pdfEl.scrollWidth,
+        windowHeight: pdfEl.scrollHeight,
+      });
+
+      // Convert canvas ke base64
+      const imageData = canvas.toDataURL('image/jpeg', 0.85);
+      const base64    = imageData.split(',')[1];
+
+      // Kirim gambar via Fonnte
+      await kirimGambarWA(base64, CFG.waKakan);
+      showNotif('✅ Laporan PDF + teks WA terkirim ke Kepala Kantor!', 'ok');
+    } catch(err) {
+      showNotif('⚠ Screenshot gagal: ' + err.message + ' — teks WA tetap terkirim', 'err');
+    }
+  } else if (CFG.webAppUrl) {
+    showNotif('✅ Data & teks WA terkirim! (Isi token Fonnte untuk kirim gambar)', 'ok');
+  } else {
+    showNotif('⚠ Isi konfigurasi dulu agar WA terkirim otomatis', 'err');
+  }
+
+  // 4. Print dialog
+  setTimeout(() => window.print(), 1200);
+}
+
+async function kirimGambarWA(base64, nomor) {
+  // Upload gambar ke Fonnte lalu kirim
+  const caption =
+    '📋 *LAPORAN PENERBANGAN HARIAN*\n' +
+    '*UPBU H. Aroeppala Selayar*\n' +
+    '📅 ' + formatTgl(v('tgl')) + '\n' +
+    '✈️ ' + v('flt_arr') + '/' + v('flt_dep') + ' — ' + v('maskapai') + '\n' +
+    '_(Laporan lengkap terlampir)_';
+
+  // Konversi base64 ke Blob
+  const byteChars  = atob(base64);
+  const byteArrays = [];
+  for (let i = 0; i < byteChars.length; i += 512) {
+    const slice = byteChars.slice(i, i + 512);
+    const bytes = new Uint8Array(slice.length);
+    for (let j = 0; j < slice.length; j++) bytes[j] = slice.charCodeAt(j);
+    byteArrays.push(bytes);
+  }
+  const blob = new Blob(byteArrays, { type: 'image/jpeg' });
+
+  // FormData untuk Fonnte
+  const formData = new FormData();
+  formData.append('target',  nomor);
+  formData.append('message', caption);
+  formData.append('file',    blob, 'laporan_penerbangan.jpg');
+
+  const resp = await fetch('https://api.fonnte.com/send', {
+    method  : 'POST',
+    headers : { 'Authorization': CFG.waToken },
+    body    : formData,
+  });
+
+  const result = await resp.json();
+  if (!result.status) throw new Error(JSON.stringify(result));
+  return result;
 }
 
 function backToForm() {
