@@ -3,294 +3,232 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Post-Flight Intelligence — UPBU H. Aroeppala Selayar</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<title>Generator Laporan PDF — UPBU H. Aroeppala Selayar</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
 <style>
-:root {
-  --navy: #0F2540;
-  --navy2: #1A3A5C;
-  --navy3: #245080;
-  --gold: #E6A817;
-  --gold2: #F5C842;
-  --white: #FFFFFF;
-  --off: #F4F6F9;
-  --muted: #7A8FA6;
-  --border: #D4DCE8;
-  --green: #1D9E75;
-  --red: #E24B4A;
-  --amber: #F59E0B;
-  --wa: #25D366;
-}
+/* ══════════════════════════════════════════
+   SCREEN UI
+══════════════════════════════════════════ */
 *{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
-body{
-  font-family:'DM Sans',sans-serif;
-  background:var(--navy);
-  color:var(--white);
-  min-height:100vh;
-}
+body{font-family:'DM Sans',sans-serif;background:#0F2540;color:#fff;min-height:100vh}
 
-/* ── HEADER ── */
-.app-header{
-  background:var(--navy);
-  border-bottom:1px solid rgba(255,255,255,0.08);
-  padding:0 1.5rem;
-  display:flex;align-items:center;justify-content:space-between;
-  height:64px;position:sticky;top:0;z-index:100;
-}
-.logo{display:flex;align-items:center;gap:12px}
-.logo-icon{
-  width:38px;height:38px;background:var(--gold);border-radius:8px;
-  display:flex;align-items:center;justify-content:center;
-  font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--navy);letter-spacing:1px;
-}
-.logo-text{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:var(--white)}
-.logo-sub{font-size:10px;color:var(--muted);letter-spacing:.5px;margin-top:-2px}
-.conn-pill{
-  display:flex;align-items:center;gap:6px;
-  background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);
-  border-radius:20px;padding:6px 12px;font-size:11px;color:var(--muted);cursor:pointer;
-}
-.conn-pill:hover{background:rgba(255,255,255,0.1)}
-.dot{width:7px;height:7px;border-radius:50%;background:var(--amber)}
-.dot.ok{background:var(--green)}
-.dot.err{background:var(--red)}
+.screen{padding:1.25rem;max-width:860px;margin:0 auto}
+.top-bar{display:flex;align-items:center;gap:12px;margin-bottom:1.25rem;padding-bottom:1rem;border-bottom:1px solid rgba(255,255,255,0.08)}
+.top-icon{width:42px;height:42px;background:#E6A817;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#0F2540;flex-shrink:0}
+.top-title{font-size:16px;font-weight:600}
+.top-sub{font-size:11px;color:rgba(255,255,255,.5);margin-top:1px}
 
-/* ── TABS ── */
-.tabs{
-  display:flex;gap:0;border-bottom:1px solid rgba(255,255,255,0.08);
-  padding:0 1.5rem;background:var(--navy);overflow-x:auto;
-}
-.tab{
-  padding:14px 20px;font-size:13px;font-weight:500;color:var(--muted);
-  border:none;background:transparent;cursor:pointer;border-bottom:2px solid transparent;
-  white-space:nowrap;transition:all .2s;
-}
-.tab:hover{color:var(--white)}
-.tab.active{color:var(--gold);border-bottom-color:var(--gold)}
-
-/* ── MAIN ── */
-.main{padding:1.5rem;max-width:900px;margin:0 auto}
-.panel{display:none}.panel.active{display:block}
-
-/* ── SECTION CARD ── */
-.scard{
-  background:rgba(255,255,255,0.04);
-  border:1px solid rgba(255,255,255,0.08);
-  border-radius:14px;padding:1.25rem;margin-bottom:1rem;
-}
-.scard-title{
-  font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
-  color:var(--gold);margin-bottom:1rem;display:flex;align-items:center;gap:8px;
-}
-.scard-title::after{content:'';flex:1;height:1px;background:rgba(255,255,255,0.06)}
-
-/* ── FORM ELEMENTS ── */
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
-.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.scard{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);border-radius:12px;padding:1.1rem;margin-bottom:.9rem}
+.scard-title{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#E6A817;margin-bottom:.9rem;display:flex;align-items:center;gap:8px}
+.scard-title::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.06)}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
 .full{grid-column:1/-1}
-.fld{display:flex;flex-direction:column;gap:5px}
-.fld label{font-size:11px;font-weight:500;color:var(--muted);letter-spacing:.03em}
+.fld{display:flex;flex-direction:column;gap:4px}
+.fld label{font-size:11px;color:rgba(255,255,255,.45)}
 .fld input,.fld select,.fld textarea{
-  background:rgba(255,255,255,0.06);
-  border:1px solid rgba(255,255,255,0.1);
-  border-radius:8px;padding:9px 12px;
-  font-family:'DM Sans',sans-serif;font-size:13px;color:var(--white);
-  transition:border-color .2s,background .2s;width:100%;
-}
-.fld input:focus,.fld select:focus,.fld textarea:focus{
-  outline:none;border-color:var(--gold);background:rgba(230,168,23,0.06);
-}
-.fld select option{background:var(--navy2);color:var(--white)}
-.fld input[readonly]{opacity:.6;cursor:default}
-.fld textarea{resize:vertical;min-height:60px;line-height:1.5}
-.fld input::placeholder{color:rgba(255,255,255,0.25)}
+  background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.11);
+  border-radius:7px;padding:7px 10px;font-size:12.5px;color:#fff;
+  font-family:'DM Sans',sans-serif;width:100%;transition:border-color .15s}
+.fld input:focus,.fld select:focus,.fld textarea:focus{outline:none;border-color:#E6A817}
+.fld select option{background:#1A3A5C}
+.fld input[readonly]{opacity:.5}
+.fld textarea{resize:vertical;min-height:52px;line-height:1.5}
 
-/* ── STAT CARDS ── */
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:1rem}
-.stat{
-  background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);
-  border-radius:10px;padding:12px;text-align:center;
-}
-.stat .n{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--gold);line-height:1}
-.stat .l{font-size:10px;color:var(--muted);margin-top:4px;letter-spacing:.03em}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:.9rem}
+.stat{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:9px;padding:10px;text-align:center}
+.stat .n{font-size:20px;font-weight:600;color:#E6A817}
+.stat .l{font-size:10px;color:rgba(255,255,255,.45);margin-top:3px}
 
-/* ── BUTTONS ── */
+/* Upload zone */
+.upload-zone{
+  border:1.5px dashed rgba(255,255,255,.2);border-radius:10px;
+  padding:1.25rem;text-align:center;cursor:pointer;transition:all .15s;
+  background:rgba(255,255,255,.03)
+}
+.upload-zone:hover{background:rgba(255,255,255,.07);border-color:rgba(230,168,23,.5)}
+.upload-zone input{display:none}
+.upload-zone .icon{font-size:28px;margin-bottom:6px}
+.upload-zone p{font-size:12px;color:rgba(255,255,255,.5)}
+.upload-zone .hint{font-size:10px;color:rgba(255,255,255,.3);margin-top:4px}
+.photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.photo-thumb{position:relative;aspect-ratio:4/3;border-radius:7px;overflow:hidden;background:rgba(255,255,255,.05)}
+.photo-thumb img{width:100%;height:100%;object-fit:cover}
+.photo-thumb .del{
+  position:absolute;top:4px;right:4px;width:20px;height:20px;
+  background:rgba(226,75,74,.9);border:none;border-radius:50%;
+  color:#fff;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.photo-thumb .lbl{
+  position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.6);
+  font-size:9px;color:#fff;padding:3px 6px;text-align:center}
+.photo-label-row{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+.label-chip{
+  padding:4px 10px;border-radius:20px;font-size:10px;cursor:pointer;border:1px solid rgba(255,255,255,.15);
+  background:transparent;color:rgba(255,255,255,.5);transition:all .15s}
+.label-chip.active{background:#E6A817;color:#0F2540;border-color:#E6A817;font-weight:600}
+
 .btn-row{display:flex;gap:8px;margin-top:1rem;flex-wrap:wrap}
-.btn{
-  flex:1;min-width:120px;padding:11px 16px;border-radius:8px;font-size:13px;font-weight:500;
-  cursor:pointer;border:none;transition:all .15s;font-family:'DM Sans',sans-serif;
-}
-.btn-navy{background:var(--navy2);color:var(--white);border:1px solid rgba(255,255,255,0.15)}
-.btn-navy:hover{background:var(--navy3)}
-.btn-gold{background:var(--gold);color:var(--navy)}
-.btn-gold:hover{background:var(--gold2)}
-.btn-green{background:var(--green);color:var(--white)}
-.btn-green:hover{background:#17846a}
-.btn-wa{background:var(--wa);color:var(--white)}
-.btn-wa:hover{background:#1db954}
-.btn-red{background:var(--red);color:var(--white)}
-.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn{flex:1;min-width:130px;padding:11px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:all .15s}
+.btn-gold{background:#E6A817;color:#0F2540}
+.btn-gold:hover{background:#F5C842}
+.btn-navy{background:rgba(255,255,255,.09);color:#fff;border:1px solid rgba(255,255,255,.18)}
+.btn-navy:hover{background:rgba(255,255,255,.15)}
+.btn-green{background:#1D9E75;color:#fff}
 
-/* ── STATUS MESSAGES ── */
-.status-msg{
-  border-radius:8px;padding:10px 14px;font-size:12px;line-height:1.6;
-  margin-top:10px;display:none;white-space:pre-line;
-}
-.status-ok{background:rgba(29,158,117,0.15);border:1px solid rgba(29,158,117,0.3);color:#6ee7b7}
-.status-err{background:rgba(226,75,74,0.15);border:1px solid rgba(226,75,74,0.3);color:#fca5a5}
-.status-loading{background:rgba(230,168,23,0.1);border:1px solid rgba(230,168,23,0.2);color:var(--gold)}
+/* ══════════════════════════════════════════
+   PDF PAGE
+══════════════════════════════════════════ */
+.pdf-wrap{display:none;background:#fff}
 
-/* ── PREVIEW ── */
-.preview-box{
-  background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.08);
-  border-radius:10px;padding:1rem;font-family:'DM Mono',monospace;font-size:11px;
-  color:rgba(255,255,255,0.75);line-height:1.8;white-space:pre-wrap;
-  max-height:340px;overflow-y:auto;
-}
-.wa-box{
-  background:#0a1a14;border:1px solid rgba(37,211,102,0.2);
-  border-radius:10px;padding:1rem;font-size:12px;
-  color:#ECE5DD;line-height:1.8;white-space:pre-wrap;
-  max-height:340px;overflow-y:auto;font-family:'DM Mono',monospace;
+@media print{
+  .screen{display:none!important}
+  .pdf-wrap{display:block!important}
+  .no-print{display:none!important}
+  @page{margin:0;size:A4}
 }
 
-/* ── SETUP STEPS ── */
-.setup-step{
-  display:flex;gap:14px;padding:14px 0;
-  border-bottom:1px solid rgba(255,255,255,0.06);
-}
-.setup-step:last-child{border-bottom:none}
-.step-num{
-  width:28px;height:28px;border-radius:50%;
-  background:var(--gold);color:var(--navy);
-  font-size:12px;font-weight:700;display:flex;align-items:center;
-  justify-content:center;flex-shrink:0;margin-top:2px;
-}
-.step-num.done{background:var(--green)}
-.step-title{font-size:13px;font-weight:600;color:var(--white);margin-bottom:3px}
-.step-desc{font-size:12px;color:var(--muted);line-height:1.6}
-.code-inline{
-  background:rgba(255,255,255,0.08);border-radius:4px;
-  padding:1px 6px;font-family:'DM Mono',monospace;font-size:11px;color:var(--gold2);
+.pdf-page{
+  width:210mm;min-height:297mm;background:#fff;color:#000;
+  font-family:'DM Sans',sans-serif;font-size:10pt;
+  position:relative;overflow:hidden;
 }
 
-/* ── SECTION DIVIDER ── */
-.divider{
-  font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:3px;
-  color:var(--muted);margin:1.25rem 0 .75rem;display:flex;align-items:center;gap:10px;
+/* PDF — Header */
+.ph{
+  background:#1A3A5C;padding:8mm 12mm 6mm;
+  display:flex;justify-content:space-between;align-items:center;
 }
-.divider::before,.divider::after{content:'';flex:1;height:1px;background:rgba(255,255,255,0.06)}
+.ph-left{display:flex;align-items:center;gap:10px}
+.ph-logo{width:50px;height:50px;flex-shrink:0}
+.ph-logo svg{width:100%;height:100%}
+.ph-org{color:#fff}
+.ph-org-name{font-size:14pt;font-weight:700;letter-spacing:.5px;color:#fff}
+.ph-org-sub{font-size:7.5pt;color:rgba(255,255,255,.7);margin-top:1px}
+.ph-right{text-align:right;color:#fff}
+.ph-date-label{font-size:7.5pt;color:rgba(255,255,255,.6)}
+.ph-date{font-size:11pt;font-weight:700;color:#E6A817;margin-top:2px}
 
-/* ── FONNTE CARD ── */
-.fonnte-card{
-  background:linear-gradient(135deg,rgba(37,211,102,0.08),rgba(37,211,102,0.02));
-  border:1px solid rgba(37,211,102,0.2);border-radius:14px;padding:1.25rem;
+/* Gold strip */
+.gold-strip{height:4px;background:linear-gradient(90deg,#E6A817,#F5C842,#E6A817)}
+
+/* PDF — Title */
+.pt{text-align:center;padding:5mm 12mm 4mm;border-bottom:1px solid #E6A817}
+.pt-main{font-size:16pt;font-weight:700;color:#1A3A5C;letter-spacing:1px}
+.pt-sub{font-size:9pt;font-weight:600;color:#E6A817;margin-top:2px}
+.pt-kpd{font-size:8pt;color:#666;margin-top:3px;font-style:italic}
+
+/* PDF — Foto grid */
+.pf{padding:4mm 12mm 3mm}
+.pf-label{
+  font-size:9pt;font-weight:700;color:#fff;
+  background:#1A3A5C;display:inline-block;
+  padding:3px 10px;border-radius:20px;margin-bottom:4mm;
 }
+.pf-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3mm}
+.pf-img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:4px;display:block}
+.pf-img-placeholder{
+  width:100%;aspect-ratio:4/3;background:#f0f0f0;border-radius:4px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:8pt;color:#aaa;border:1px dashed #ddd;
+}
+.pf-cat{text-align:center;font-size:7.5pt;font-weight:600;color:#E6A817;margin-top:2mm;text-transform:uppercase;letter-spacing:.05em}
 
-/* ── MOBILE ── */
+/* PDF — Summary bar (yellow) */
+.ps{background:#E6A817;padding:5mm 12mm}
+.ps-title{font-size:11pt;font-weight:700;color:#1A3A5C;text-align:center;margin-bottom:3mm}
+.ps-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:4mm}
+.ps-card{background:rgba(255,255,255,.5);border-radius:6px;padding:5px 8px;text-align:center}
+.ps-n{font-size:16pt;font-weight:700;color:#1A3A5C}
+.ps-l{font-size:7pt;color:#1A3A5C;text-transform:uppercase;letter-spacing:.04em;font-weight:600}
+
+/* PDF — Data table */
+.pd{padding:3mm 12mm}
+.pd-section{
+  font-size:8pt;font-weight:700;color:#fff;
+  background:#1A3A5C;padding:3px 8px;
+  border-radius:3px 3px 0 0;display:inline-block;margin-bottom:0;margin-top:3mm;
+}
+.pd-section.dep{background:#245080}
+table.ptbl{width:100%;border-collapse:collapse;font-size:7.5pt;margin-bottom:2mm}
+table.ptbl th{background:#1A3A5C;color:#fff;padding:4px 5px;text-align:center;font-weight:600;font-size:7pt}
+table.ptbl td{padding:4px 5px;border:0.5px solid #e0e0e0;text-align:center;color:#222}
+table.ptbl tr:nth-child(even) td{background:#F8F9FB}
+.td-bold{font-weight:700}
+.td-delay{background:#FFF8E1!important;color:#854F0B!important;font-weight:600}
+
+/* PDF — Catatan & TTD */
+.pc{padding:2mm 12mm}
+.pc-title{font-size:8pt;font-weight:700;color:#1A3A5C;margin-bottom:2px}
+.pc-text{font-size:8pt;color:#333;font-style:italic;line-height:1.6}
+.pttd{display:flex;justify-content:flex-end;padding:3mm 12mm 6mm}
+.pttd-box{text-align:center;width:150px}
+.pttd-label{font-size:8.5pt;font-weight:600;color:#1A3A5C}
+.pttd-sub{font-size:7.5pt;color:#666;margin-top:2px;line-height:1.4}
+.pttd-space{height:50px}
+.pttd-name{font-size:8.5pt;font-weight:700;text-decoration:underline;color:#1A3A5C}
+.pttd-nip{font-size:7pt;color:#666;margin-top:2px}
+
+/* PDF — Footer */
+.pfoot{
+  background:#1A3A5C;padding:4px 12mm;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.pfoot-name{font-size:9pt;font-weight:700;color:#E6A817;letter-spacing:1px}
+.pfoot-info{font-size:7pt;color:rgba(255,255,255,.65);text-align:center}
+.pfoot-addr{font-size:7pt;color:rgba(255,255,255,.65);text-align:right}
+
 @media(max-width:600px){
-  .grid2,.grid3,.grid4,.stats{grid-template-columns:1fr 1fr}
-  .grid3{grid-template-columns:1fr 1fr 1fr}
+  .g2,.g3,.g4,.stats{grid-template-columns:1fr 1fr}
   .full{grid-column:1/-1}
-  .tabs .tab{padding:12px 14px;font-size:12px}
   .btn-row{flex-direction:column}
-  .btn{min-width:unset}
-  .stats{grid-template-columns:repeat(2,1fr)}
-}
-@media(max-width:380px){
-  .grid2{grid-template-columns:1fr}
-  .stats{grid-template-columns:repeat(2,1fr)}
-}
-
-/* ── LOADING SPINNER ── */
-@keyframes spin{to{transform:rotate(360deg)}}
-.spinner{
-  width:16px;height:16px;border:2px solid rgba(255,255,255,0.2);
-  border-top-color:var(--gold);border-radius:50%;
-  animation:spin .7s linear infinite;display:inline-block;margin-right:6px;vertical-align:middle;
-}
-
-/* ── CONNECTION MODAL ── */
-.modal-overlay{
-  display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);
-  z-index:200;align-items:center;justify-content:center;padding:1rem;
-}
-.modal-overlay.open{display:flex}
-.modal{
-  background:var(--navy2);border:1px solid rgba(255,255,255,0.12);
-  border-radius:16px;padding:1.5rem;width:100%;max-width:500px;
-}
-.modal-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;margin-bottom:.5rem}
-.modal-desc{font-size:12px;color:var(--muted);margin-bottom:1.25rem;line-height:1.6}
-.modal-close{
-  float:right;background:transparent;border:none;color:var(--muted);
-  font-size:20px;cursor:pointer;line-height:1;margin-top:-4px;
 }
 </style>
 </head>
 <body>
 
-<!-- CONNECTION MODAL -->
-<div class="modal-overlay" id="conn-modal">
-  <div class="modal">
-    <button class="modal-close" onclick="closeModal()">×</button>
-    <div class="modal-title">Koneksi Sistem</div>
-    <div class="modal-desc">Masukkan URL Web App Google Apps Script untuk menghubungkan form ke Google Sheets.</div>
-    <div class="fld" style="margin-bottom:10px">
-      <label>Web App URL</label>
-      <input type="text" id="modal-url" placeholder="https://script.google.com/macros/s/..." />
+<!-- CONFIG MODAL -->
+<div id="cfg-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;align-items:center;justify-content:center;padding:1rem">
+  <div style="background:#1A3A5C;border:1px solid rgba(255,255,255,.15);border-radius:14px;padding:1.5rem;width:100%;max-width:460px">
+    <div style="font-size:16px;font-weight:600;margin-bottom:.4rem">Konfigurasi Sistem</div>
+    <div style="font-size:12px;color:rgba(255,255,255,.5);margin-bottom:1.1rem">Hubungkan PDF generator ke Google Sheets & WhatsApp otomatis</div>
+    <div style="display:flex;flex-direction:column;gap:4px;margin-bottom:10px">
+      <label style="font-size:11px;color:rgba(255,255,255,.45)">Web App URL (Google Apps Script)</label>
+      <input id="cfg-url" type="text" placeholder="https://script.google.com/macros/s/..." style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);border-radius:7px;padding:8px 11px;font-size:12px;color:#fff;width:100%"/>
     </div>
-    <div class="fld" style="margin-bottom:10px">
-      <label>Nomor WhatsApp Kepala Kantor (628xxx)</label>
-      <input type="text" id="modal-wa" placeholder="628xxxxxxxxx" />
-    </div>
-    <div class="fld" style="margin-bottom:1rem">
-      <label>Token Fonnte (opsional — isi setelah daftar fonnte.com)</label>
-      <input type="text" id="modal-token" placeholder="token dari fonnte.com" />
+    <div style="display:flex;flex-direction:column;gap:4px;margin-bottom:1.1rem">
+      <label style="font-size:11px;color:rgba(255,255,255,.45)">Nomor WhatsApp Kepala Kantor (628xxx)</label>
+      <input id="cfg-wa" type="text" placeholder="628xxxxxxxxx" style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);border-radius:7px;padding:8px 11px;font-size:12px;color:#fff;width:100%"/>
     </div>
     <div style="display:flex;gap:8px">
-      <button class="btn btn-gold" style="flex:1" onclick="saveConfig()">Simpan & Hubungkan</button>
-      <button class="btn btn-navy" onclick="closeModal()">Batal</button>
+      <button onclick="saveConfig()" style="flex:1;padding:10px;background:#E6A817;color:#0F2540;border:none;border-radius:7px;font-weight:600;cursor:pointer;font-size:13px">Simpan</button>
+      <button onclick="el('cfg-modal').style.display='none'" style="padding:10px 16px;background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:7px;cursor:pointer;font-size:13px">Nanti</button>
     </div>
-    <div id="modal-status" class="status-msg"></div>
   </div>
 </div>
 
-<!-- HEADER -->
-<header class="app-header">
-  <div class="logo">
-    <div class="logo-icon">PFI</div>
+
+<!-- ═══ SCREEN UI ═══ -->
+<div class="screen">
+  <div class="top-bar">
+    <div class="top-icon">PDF</div>
     <div>
-      <div class="logo-text">Post-Flight Intelligence</div>
-      <div class="logo-sub">UPBU Kelas III H. Aroeppala Selayar — Unit LLAU</div>
+      <div class="top-title">Generator Laporan PDF</div>
+      <div class="top-sub">UPBU Kelas III H. Aroeppala Selayar — Unit LLAU</div>
+
+    <div style="margin-left:auto;display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:6px 12px;cursor:pointer;font-size:11px;color:rgba(255,255,255,.6)" onclick="el('cfg-modal').style.display='flex'">
+      <div id="cfg-dot" style="width:7px;height:7px;border-radius:50%;background:#F59E0B"></div>
+      <span id="cfg-label">Konfigurasi</span>
+    </div>
+
     </div>
   </div>
-  <div class="conn-pill" onclick="openModal()">
-    <div class="dot" id="conn-dot"></div>
-    <span id="conn-label">Konfigurasi</span>
-  </div>
-</header>
 
-<!-- TABS -->
-<div class="tabs">
-  <button class="tab active" onclick="switchTab('input')">✍ Input Data</button>
-  <button class="tab" onclick="switchTab('laporan')">📄 Laporan</button>
-  <button class="tab" onclick="switchTab('wa')">💬 WhatsApp</button>
-  <button class="tab" onclick="switchTab('setup')">⚙ Setup</button>
-</div>
-
-<!-- MAIN -->
-<div class="main">
-
-<!-- ═══ TAB: INPUT DATA ═══ -->
-<div id="tab-input" class="panel active">
-
+  <!-- Info Penerbangan -->
   <div class="scard">
     <div class="scard-title">Informasi penerbangan</div>
-    <div class="grid2">
-      <div class="fld"><label>Tanggal</label><input type="date" id="tgl" oninput="onTglChange()"/></div>
+    <div class="g2">
+      <div class="fld"><label>Tanggal</label><input type="date" id="tgl" oninput="onTgl()"/></div>
       <div class="fld"><label>Hari</label><input type="text" id="hari" readonly/></div>
       <div class="fld"><label>Maskapai</label><input type="text" id="maskapai" value="Fly Jaya"/></div>
       <div class="fld"><label>Operator</label><input type="text" id="operator" value="PT. Surya Mataram Nusantara"/></div>
@@ -300,51 +238,47 @@ body{
     </div>
   </div>
 
-  <div class="grid2" style="gap:10px">
+  <!-- Arrival & Departure -->
+  <div class="g2" style="gap:9px">
     <div class="scard">
       <div class="scard-title">🛬 Arrival</div>
-      <div style="display:flex;flex-direction:column;gap:8px">
-        <div class="grid2">
-          <div class="fld"><label>No flight ARR</label><input type="text" id="flt_arr" value="KS503"/></div>
-          <div class="fld"><label>Route ARR</label><input type="text" id="route_arr" value="UPG"/></div>
+      <div style="display:flex;flex-direction:column;gap:7px">
+        <div class="g2">
+          <div class="fld"><label>Flt ARR</label><input type="text" id="flt_arr" value="KS503"/></div>
+          <div class="fld"><label>Route</label><input type="text" id="route_arr" value="UPG"/></div>
         </div>
-        <div class="grid2">
-          <div class="fld"><label>STA (LT)</label><input type="time" id="sta" value="14:10" oninput="calcDelay()"/></div>
-          <div class="fld"><label>ATA (LT)</label><input type="time" id="ata" value="14:26" oninput="calcDelay()"/></div>
+        <div class="g2">
+          <div class="fld"><label>STA</label><input type="time" id="sta" value="14:10" oninput="calc()"/></div>
+          <div class="fld"><label>ATA</label><input type="time" id="ata" value="14:26" oninput="calc()"/></div>
         </div>
-        <div id="delay-arr-info" style="font-size:11px;color:var(--amber);display:none"></div>
-        <div class="scard-title" style="margin-top:4px">Pax tiba</div>
-        <div class="grid3">
+        <div class="g3">
           <div class="fld"><label>Dewasa</label><input type="number" id="pd" value="44" min="0" oninput="calc()"/></div>
           <div class="fld"><label>Anak</label><input type="number" id="pa" value="5" min="0" oninput="calc()"/></div>
           <div class="fld"><label>Bayi</label><input type="number" id="pb" value="2" min="0" oninput="calc()"/></div>
         </div>
-        <div class="grid2">
+        <div class="g2">
           <div class="fld"><label>Bagasi (kg)</label><input type="number" id="bgs_a" value="328" oninput="calc()"/></div>
           <div class="fld"><label>Kargo (kg)</label><input type="number" id="cgo_a" value="0" oninput="calc()"/></div>
         </div>
       </div>
     </div>
-
     <div class="scard">
       <div class="scard-title">🛫 Departure</div>
-      <div style="display:flex;flex-direction:column;gap:8px">
-        <div class="grid2">
-          <div class="fld"><label>No flight DEP</label><input type="text" id="flt_dep" value="KS504"/></div>
-          <div class="fld"><label>Route DEP</label><input type="text" id="route_dep" value="KSR"/></div>
+      <div style="display:flex;flex-direction:column;gap:7px">
+        <div class="g2">
+          <div class="fld"><label>Flt DEP</label><input type="text" id="flt_dep" value="KS504"/></div>
+          <div class="fld"><label>Route</label><input type="text" id="route_dep" value="KSR"/></div>
         </div>
-        <div class="grid2">
-          <div class="fld"><label>STD (LT)</label><input type="time" id="std" value="15:07" oninput="calcDelay()"/></div>
-          <div class="fld"><label>ATD (LT)</label><input type="time" id="atd" value="15:11" oninput="calcDelay()"/></div>
+        <div class="g2">
+          <div class="fld"><label>STD</label><input type="time" id="std" value="15:07" oninput="calc()"/></div>
+          <div class="fld"><label>ATD</label><input type="time" id="atd" value="15:11" oninput="calc()"/></div>
         </div>
-        <div id="delay-dep-info" style="font-size:11px;color:var(--amber);display:none"></div>
-        <div class="scard-title" style="margin-top:4px">Pax berangkat</div>
-        <div class="grid3">
+        <div class="g3">
           <div class="fld"><label>Dewasa</label><input type="number" id="dd" value="61" min="0" oninput="calc()"/></div>
           <div class="fld"><label>Anak</label><input type="number" id="da" value="4" min="0" oninput="calc()"/></div>
           <div class="fld"><label>Bayi</label><input type="number" id="db" value="3" min="0" oninput="calc()"/></div>
         </div>
-        <div class="grid2">
+        <div class="g2">
           <div class="fld"><label>Bagasi (kg)</label><input type="number" id="bgs_d" value="228" oninput="calc()"/></div>
           <div class="fld"><label>Kargo (kg)</label><input type="number" id="cgo_d" value="0" oninput="calc()"/></div>
         </div>
@@ -352,526 +286,399 @@ body{
     </div>
   </div>
 
+  <!-- Stats -->
   <div class="stats">
     <div class="stat"><div class="n" id="s1">51</div><div class="l">Pax tiba</div></div>
     <div class="stat"><div class="n" id="s2">68</div><div class="l">Pax berangkat</div></div>
-    <div class="stat"><div class="n" id="s3">556</div><div class="l">Total bagasi (kg)</div></div>
+    <div class="stat"><div class="n" id="s3">556</div><div class="l">Bagasi (kg)</div></div>
     <div class="stat"><div class="n" id="s4">119</div><div class="l">Grand total pax</div></div>
   </div>
 
+  <!-- Upload Foto -->
   <div class="scard">
-    <div class="scard-title">Keterangan</div>
-    <div class="grid2">
+    <div class="scard-title">📸 Dokumentasi foto</div>
+    <div class="upload-zone" onclick="document.getElementById('fotoInput').click()">
+      <input type="file" id="fotoInput" accept="image/*" multiple onchange="handlePhotos(event)"/>
+      <div class="icon">📷</div>
+      <p>Klik untuk upload foto penerbangan</p>
+      <div class="hint">Bisa pilih beberapa foto sekaligus (JPG, PNG) — max 6 foto</div>
+    </div>
+    <div id="photo-grid" class="photo-grid" style="display:none"></div>
+  </div>
+
+  <!-- Keterangan -->
+  <div class="scard">
+    <div class="scard-title">Keterangan & TTD</div>
+    <div class="g2">
       <div class="fld">
-        <label>Remark / Status</label>
-        <select id="remark">
-          <option>Regular Flight</option>
-          <option>Extra Flight</option>
-          <option>Charter Flight</option>
-          <option>Delay</option>
-          <option>Cancelled</option>
-        </select>
+        <label>Remark</label>
+        <select id="remark"><option>Regular Flight</option><option>Extra Flight</option><option>Charter Flight</option><option>Delay</option></select>
       </div>
       <div class="fld"><label>Petugas jaga</label><input type="text" id="petugas" placeholder="Nama petugas LLAU"/></div>
-      <div class="fld full">
-        <label>Catatan</label>
-        <textarea id="catatan">seluruh aktivitas pelayanan penerbangan telah berjalan dengan lancar dan dilaksanakan sesuai dengan standar operasional yang berlaku.</textarea>
-      </div>
+      <div class="fld"><label>Nama Kepala Kantor</label><input type="text" id="kakan" value="Hery Sugianto, S.T."/></div>
+      <div class="fld"><label>NIP</label><input type="text" id="nip" placeholder="NIP Kepala Kantor"/></div>
+      <div class="fld full"><label>Catatan</label><textarea id="catatan">seluruh aktivitas pelayanan penerbangan telah berjalan dengan lancar dan dilaksanakan sesuai dengan standar operasional yang berlaku.</textarea></div>
     </div>
   </div>
 
   <div class="btn-row">
-    <button class="btn btn-gold" onclick="submitData()">Simpan ke Sheets</button>
-    <button class="btn btn-green" onclick="goLaporan()">Lihat Laporan</button>
-    <button class="btn btn-wa" onclick="goWA()">Kirim WhatsApp</button>
-  </div>
-  <div id="submit-status" class="status-msg"></div>
-</div>
-
-<!-- ═══ TAB: LAPORAN ═══ -->
-<div id="tab-laporan" class="panel">
-  <div class="scard">
-    <div class="scard-title">Preview laporan penerbangan harian</div>
-    <div class="preview-box" id="preview-text">Generate laporan dari tab Input Data.</div>
-  </div>
-  <div class="btn-row">
-    <button class="btn btn-gold" onclick="generateAll()">Generate Preview</button>
-    <button class="btn btn-navy" onclick="copyPreview()">Salin Teks</button>
-    <button class="btn btn-green" onclick="printLaporan()">Cetak / Save PDF</button>
+    <button class="btn btn-gold" onclick="previewPDF()">👁 Preview PDF</button>
+    <button class="btn btn-navy" onclick="generateAndPrint()">🖨 Cetak / Save PDF</button>
   </div>
 </div>
 
-<!-- ═══ TAB: WHATSAPP ═══ -->
-<div id="tab-wa" class="panel">
-  <div class="scard">
-    <div class="scard-title">Nomor tujuan</div>
-    <div class="grid2">
-      <div class="fld"><label>Kepala Kantor (Bpk. Hery Sugianto)</label><input type="text" id="wa-kakan" placeholder="628xxxxxxxxx"/></div>
-      <div class="fld"><label>Nomor lain (opsional)</label><input type="text" id="wa-other" placeholder="628xxxxxxxxx"/></div>
-    </div>
-  </div>
-  <div class="scard">
-    <div class="scard-title">Preview pesan WhatsApp</div>
-    <div class="wa-box" id="wa-text">Generate dari tab Input Data terlebih dahulu.</div>
-  </div>
-  <div class="btn-row">
-    <button class="btn btn-wa" onclick="kirimWA(1)">Kirim ke Kepala Kantor</button>
-    <button class="btn btn-wa" onclick="kirimWA(2)">Kirim ke Nomor Lain</button>
-    <button class="btn btn-navy" onclick="copyWA()">Salin Pesan</button>
-  </div>
-</div>
+<!-- ═══ PDF PAGE ═══ -->
+<div class="pdf-wrap" id="pdf-wrap">
 
-<!-- ═══ TAB: SETUP ═══ -->
-<div id="tab-setup" class="panel">
+  <!-- Preview controls (hidden on print) -->
+  <div class="no-print" style="background:#0F2540;padding:12px 1.5rem;display:flex;gap:10px;align-items:center;position:sticky;top:0;z-index:100">
+    <button onclick="generateAndPrint()" style="padding:9px 18px;background:#E6A817;color:#0F2540;border:none;border-radius:7px;font-weight:600;cursor:pointer;font-size:13px">🖨 Cetak / Save PDF</button>
+    <button onclick="backToForm()" style="padding:9px 18px;background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:7px;cursor:pointer;font-size:13px">← Kembali Edit</button>
+    <span style="font-size:11px;color:rgba(255,255,255,.5);margin-left:8px">Tip: Saat cetak → pilih "Save as PDF" → Paper size A4</span>
+  </div>
 
-  <div class="scard">
-    <div class="scard-title">Status sistem</div>
-    <div class="setup-step">
-      <div class="step-num done">✓</div>
-      <div><div class="step-title">Google Sheets — selesai</div><div class="step-desc">Template xlsx sudah diupload dan sheet Data Harian, Rekap Bulanan, Log Aktivitas sudah dibuat via setupSheets().</div></div>
-    </div>
-    <div class="setup-step">
-      <div class="step-num done">✓</div>
-      <div><div class="step-title">Apps Script — deployed</div><div class="step-desc">Web App sudah live. GET request berhasil mengembalikan data rekap dari Sheets.</div></div>
-    </div>
-    <div class="setup-step">
-      <div class="step-num" id="step3-num">3</div>
-      <div><div class="step-title">Web App URL — <span id="step3-status" style="color:var(--amber)">belum diisi</span></div>
-      <div class="step-desc">Klik tombol <span class="code-inline">Konfigurasi</span> di pojok kanan atas untuk paste URL Web App kamu.</div>
-      <button class="btn btn-gold" style="margin-top:10px;flex:0;padding:8px 16px" onclick="openModal()">Isi URL Sekarang</button>
+  <div class="pdf-page" id="pdf-page">
+
+    <!-- Header navy -->
+    <div class="ph">
+      <div class="ph-left">
+        <svg class="ph-logo" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="30" cy="30" r="28" stroke="#E6A817" stroke-width="2.5"/>
+          <path d="M12 36 L30 14 L48 36" stroke="#E6A817" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <path d="M20 36 L30 22 L40 36" fill="#E6A817"/>
+          <rect x="24" y="36" width="12" height="7" rx="1.5" fill="#E6A817"/>
+        </svg>
+        <div class="ph-org">
+          <div class="ph-org-name">Kantor UPBU H. Aroeppala Selayar</div>
+          <div class="ph-org-sub">Direktorat Jenderal Perhubungan Udara — Kementerian Perhubungan RI</div>
+        </div>
+      </div>
+      <div class="ph-right">
+        <div class="ph-date-label">Tanggal:</div>
+        <div class="ph-date" id="p-tgl">—</div>
       </div>
     </div>
-    <div class="setup-step">
-      <div class="step-num" id="step4-num">4</div>
-      <div><div class="step-title">WhatsApp Fonnte — <span id="step4-status" style="color:var(--amber)">belum dikonfigurasi</span></div>
-      <div class="step-desc">Ikuti panduan di bawah untuk aktivasi notifikasi WA otomatis.</div></div>
-    </div>
-  </div>
+    <div class="gold-strip"></div>
 
-  <div class="fonnte-card" style="margin-bottom:1rem">
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:1rem">
-      <div style="width:36px;height:36px;background:var(--wa);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px">💬</div>
-      <div>
-        <div style="font-weight:600;font-size:14px">Setup WhatsApp — Fonnte Gateway</div>
-        <div style="font-size:11px;color:var(--muted)">Gateway WA Indonesia, mulai gratis</div>
+    <!-- Title -->
+    <div class="pt">
+      <div class="pt-main">Laporan Penerbangan Harian</div>
+      <div class="pt-sub">Kantor UPBU H. Aroeppala Selayar</div>
+      <div class="pt-kpd">Kepada Yth. Dirjen Perhubungan Udara &nbsp;•&nbsp; Sesditjen Perhubungan Udara &nbsp;•&nbsp; Direktur Bandar Udara &nbsp;•&nbsp; Kepala OBU Wil. V Makassar</div>
+    </div>
+
+    <!-- FOTO SECTION -->
+    <div class="pf" id="p-foto-section">
+      <div class="pf-label">Dokumentasi Penerbangan</div>
+      <div class="pf-grid" id="p-foto-grid"></div>
+    </div>
+
+    <!-- Summary Bar (gold) -->
+    <div class="ps">
+      <div class="ps-title" id="p-movement-title">Movement Report</div>
+      <div class="ps-grid">
+        <div class="ps-card">
+          <div class="ps-n">1 / 1</div>
+          <div class="ps-l">Datang / Berangkat</div>
+        </div>
+        <div class="ps-card">
+          <div class="ps-n" id="p-pax-arr-s">—</div>
+          <div class="ps-l">Penumpang Datang</div>
+        </div>
+        <div class="ps-card">
+          <div class="ps-n" id="p-pax-dep-s">—</div>
+          <div class="ps-l">Penumpang Berangkat</div>
+        </div>
+        <div class="ps-card">
+          <div class="ps-n" id="p-bgs-s">—</div>
+          <div class="ps-l">Total Bagasi (kg)</div>
+        </div>
       </div>
     </div>
-    <div class="setup-step" style="border-color:rgba(37,211,102,0.1)">
-      <div class="step-num" style="background:var(--wa);color:#fff;font-size:11px">1</div>
-      <div><div class="step-title">Daftar di Fonnte</div>
-      <div class="step-desc">Buka fonnte.com → daftar akun → verifikasi nomor WhatsApp yang akan digunakan untuk kirim laporan (bisa nomor kantor atau nomor kamu).</div>
-      <button class="btn btn-wa" style="margin-top:8px;flex:0;padding:7px 14px;font-size:12px" onclick="window.open('https://fonnte.com','_blank')">Buka Fonnte.com</button>
+
+    <!-- Tables -->
+    <div class="pd">
+      <div class="pd-section">ARRIVAL</div>
+      <table class="ptbl">
+        <thead>
+          <tr>
+            <th>No</th><th>Tanggal</th><th>Route ARR</th><th>AOC</th><th>Reg</th><th>Type AC</th>
+            <th>Flt No</th><th>STA (LT)</th><th>ATA (LT)</th>
+            <th>D</th><th>A</th><th>B</th><th>Total</th>
+            <th>Bagasi (kg)</th><th>Kargo (kg)</th><th>ARR</th><th>Remark</th>
+          </tr>
+        </thead>
+        <tbody id="p-arr-body"></tbody>
+      </table>
+
+      <div class="pd-section dep">DEPARTURE</div>
+      <table class="ptbl">
+        <thead>
+          <tr>
+            <th>No</th><th>Tanggal</th><th>Route DEP</th><th>AOC</th><th>Reg</th><th>Type AC</th>
+            <th>Flt No</th><th>STD (LT)</th><th>ATD (LT)</th>
+            <th>D</th><th>A</th><th>B</th><th>Total</th>
+            <th>Bagasi (kg)</th><th>Kargo (kg)</th><th>DEP</th><th>Remark</th>
+          </tr>
+        </thead>
+        <tbody id="p-dep-body"></tbody>
+      </table>
+    </div>
+
+    <!-- Catatan -->
+    <div class="pc">
+      <div class="pc-title">Catatan :</div>
+      <div class="pc-text" id="p-catatan">—</div>
+    </div>
+
+    <!-- TTD -->
+    <div class="pttd">
+      <div class="pttd-box">
+        <div class="pttd-label">Hormat kami,</div>
+        <div class="pttd-sub">Kepala Kantor<br>UPBU H. Aroeppala Selayar</div>
+        <div class="pttd-space"></div>
+        <div class="pttd-name" id="p-kakan">Hery Sugianto, S.T.</div>
+        <div class="pttd-nip" id="p-nip"></div>
       </div>
     </div>
-    <div class="setup-step" style="border-color:rgba(37,211,102,0.1)">
-      <div class="step-num" style="background:var(--wa);color:#fff;font-size:11px">2</div>
-      <div><div class="step-title">Dapatkan Token API</div>
-      <div class="step-desc">Di dashboard Fonnte → menu <span class="code-inline">Device</span> → salin token yang tersedia. Token ini yang dimasukkan ke Apps Script dan form ini.</div></div>
-    </div>
-    <div class="setup-step" style="border-color:rgba(37,211,102,0.1)">
-      <div class="step-num" style="background:var(--wa);color:#fff;font-size:11px">3</div>
-      <div><div class="step-title">Update Apps Script</div>
-      <div class="step-desc">Di Apps Script, pada bagian <span class="code-inline">CONFIG</span>, ganti:<br>
-      <span class="code-inline">WA_TOKEN : "token_fonnte_kamu"</span><br>
-      <span class="code-inline">WA_KAKAN : "628nomor_kepala_kantor"</span><br>
-      Simpan → Deploy ulang (versi baru).</div></div>
-    </div>
-    <div class="setup-step" style="border-color:rgba(37,211,102,0.1);border-bottom:none">
-      <div class="step-num" style="background:var(--wa);color:#fff;font-size:11px">4</div>
-      <div><div class="step-title">Isi token di form ini</div>
-      <div class="step-desc">Klik <span class="code-inline">Konfigurasi</span> di pojok kanan atas → isi Token Fonnte dan Nomor Kepala Kantor → Simpan. Notifikasi WA akan aktif otomatis setiap kali data disimpan.</div></div>
-    </div>
-  </div>
 
-  <div class="scard">
-    <div class="scard-title">Info aplikasi</div>
-    <div style="font-size:12px;color:var(--muted);line-height:2">
-      Versi : 1.0 — April 2026<br>
-      Unit  : LLAU — UPBU Kelas III H. Aroeppala Selayar<br>
-      Dibuat dalam rangka Aktualisasi Latsar CPNS Gelombang I Angkatan I Tahun 2026<br>
-      Kontak: aroeppalaairport@gmail.com | 0852-2034-8115
+    <!-- Footer -->
+    <div class="pfoot">
+      <div class="pfoot-name">BANDAR UDARA H. AROEPPALA</div>
+      <div class="pfoot-info">☎ 0852-2034-8115 &nbsp; ✉ aroeppalaairport@gmail.com</div>
+      <div class="pfoot-addr">Jl. Poros Padang, Kab. Kepulauan Selayar<br>Sulawesi Selatan</div>
     </div>
+
   </div>
 </div>
-
-</div><!-- /main -->
 
 <script>
-// ─── CONFIG & STATE ────────────────────────────────────────────
+const HARI_N  = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+const BULAN_N = ['Januari','Februari','Maret','April','Mei','Juni',
+                 'Juli','Agustus','September','Oktober','November','Desember'];
+
+let photos = [];
+
+const v  = id => document.getElementById(id)?.value || '';
+const n  = id => parseInt(document.getElementById(id)?.value) || 0;
+const el = id => document.getElementById(id);
+
 const CFG = {
   webAppUrl : localStorage.getItem('pfi_url') || '',
-  waKakan   : localStorage.getItem('pfi_wa') || '',
-  waToken   : localStorage.getItem('pfi_token') || '',
+  waKakan   : localStorage.getItem('pfi_wa')  || '',
 };
-
-const HARI_NAMES  = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
-const BULAN_NAMES = ['Januari','Februari','Maret','April','Mei','Juni',
-                     'Juli','Agustus','September','Oktober','November','Desember'];
-
-// ─── INIT ──────────────────────────────────────────────────────
-window.addEventListener('DOMContentLoaded', () => {
-  const today = new Date().toISOString().split('T')[0];
-  document.getElementById('tgl').value = today;
-  onTglChange();
-  calc();
-  updateConnStatus();
-
-  // Prefill WA dari config
-  if (CFG.waKakan) document.getElementById('wa-kakan').value = CFG.waKakan;
-
-  // Auto-open modal jika belum ada URL
-  if (!CFG.webAppUrl) setTimeout(openModal, 600);
-});
-
-// ─── HELPERS ───────────────────────────────────────────────────
-const v   = id => document.getElementById(id)?.value || '';
-const n   = id => parseInt(document.getElementById(id)?.value) || 0;
-const el  = id => document.getElementById(id);
 
 function formatTgl(d) {
   if (!d) return '';
   const dt = new Date(d + 'T00:00:00');
-  return `${dt.getDate()} ${BULAN_NAMES[dt.getMonth()]} ${dt.getFullYear()}`;
+  return HARI_N[dt.getDay()] + ', ' + dt.getDate() + ' ' + BULAN_N[dt.getMonth()] + ' ' + dt.getFullYear();
 }
 
-function hitungDelay(s, a) {
-  if (!s || !a) return 0;
-  const [sh,sm] = s.split(':').map(Number);
-  const [ah,am] = a.split(':').map(Number);
-  return Math.max(0, (ah*60+am) - (sh*60+sm));
-}
-
-function showStatus(id, type, msg) {
-  const e = el(id);
-  if (!e) return;
-  e.style.display = 'block';
-  e.className = 'status-msg status-' + type;
-  e.textContent = msg;
-}
-
-// ─── FORM LOGIC ────────────────────────────────────────────────
-function onTglChange() {
-  const tgl = v('tgl');
-  if (!tgl) return;
-  const dt = new Date(tgl + 'T00:00:00');
-  el('hari').value = HARI_NAMES[dt.getDay()];
+function onTgl() {
+  const d = v('tgl');
+  if (!d) return;
+  el('hari').value = HARI_N[new Date(d + 'T00:00:00').getDay()];
   calc();
 }
 
 function calc() {
-  const arrT = n('pd') + n('pa') + n('pb');
-  const depT = n('dd') + n('da') + n('db');
-  el('s1').textContent = arrT;
-  el('s2').textContent = depT;
+  const a = n('pd') + n('pa') + n('pb');
+  const d = n('dd') + n('da') + n('db');
+  el('s1').textContent = a;
+  el('s2').textContent = d;
   el('s3').textContent = n('bgs_a') + n('bgs_d');
-  el('s4').textContent = arrT + depT;
+  el('s4').textContent = a + d;
 }
 
-function calcDelay() {
-  calc();
-  const dA = hitungDelay(v('sta'), v('ata'));
-  const dD = hitungDelay(v('std'), v('atd'));
-  const eA = el('delay-arr-info');
-  const eD = el('delay-dep-info');
-  if (dA > 0) { eA.style.display='block'; eA.textContent=`⚠ Delay ARR: ${dA} menit`; }
-  else eA.style.display='none';
-  if (dD > 0) { eD.style.display='block'; eD.textContent=`⚠ Delay DEP: ${dD} menit`; }
-  else eD.style.display='none';
+function delay(s, a) {
+  if (!s || !a) return 0;
+  const [sh, sm] = s.split(':').map(Number);
+  const [ah, am] = a.split(':').map(Number);
+  return Math.max(0, (ah * 60 + am) - (sh * 60 + sm));
 }
 
-// ─── BUILD DATA ────────────────────────────────────────────────
+function handlePhotos(e) {
+  const files = Array.from(e.target.files).slice(0, 6 - photos.length);
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = ev => {
+      photos.push({ dataUrl: ev.target.result, label: guessLabel(photos.length) });
+      renderPhotoGrid();
+    };
+    reader.readAsDataURL(file);
+  });
+  e.target.value = '';
+}
+
+function guessLabel(i) {
+  const labels = ['Arrival','Terminal','Departure','Apron','Penumpang','Dokumentasi'];
+  return labels[i] || 'Dokumentasi';
+}
+
+function renderPhotoGrid() {
+  const grid = el('photo-grid');
+  if (photos.length === 0) { grid.style.display = 'none'; return; }
+  grid.style.display = 'grid';
+  grid.innerHTML = photos.map((p, i) => `
+    <div class="photo-thumb">
+      <img src="${p.dataUrl}" alt="foto ${i+1}"/>
+      <button class="del" onclick="removePhoto(${i})">x</button>
+      <div class="lbl">${p.label}</div>
+    </div>
+  `).join('');
+}
+
+function removePhoto(i) {
+  photos.splice(i, 1);
+  renderPhotoGrid();
+}
+
+function saveConfig() {
+  const url = el('cfg-url').value.trim();
+  const wa  = el('cfg-wa').value.trim();
+  if (!url) { showNotif('URL Web App wajib diisi!', 'err'); return; }
+  CFG.webAppUrl = url; CFG.waKakan = wa;
+  localStorage.setItem('pfi_url', url);
+  localStorage.setItem('pfi_wa',  wa);
+  el('cfg-modal').style.display = 'none';
+  updateCfgStatus();
+  showNotif('Konfigurasi tersimpan!', 'ok');
+}
+
+function updateCfgStatus() {
+  const dot = el('cfg-dot'), lbl = el('cfg-label');
+  if (CFG.webAppUrl) { dot.style.background='#1D9E75'; lbl.textContent='Terhubung'; }
+  else               { dot.style.background='#F59E0B'; lbl.textContent='Konfigurasi'; }
+  el('cfg-url').value = CFG.webAppUrl;
+  el('cfg-wa').value  = CFG.waKakan;
+}
+
+function kirimWAOtomatis(payload) {
+  if (!CFG.webAppUrl) return;
+  let iframe = el('wa-iframe');
+  if (!iframe) {
+    iframe = document.createElement('iframe');
+    iframe.id = iframe.name = 'wa-iframe';
+    iframe.style.display = 'none';
+    document.body.appendChild(iframe);
+  }
+  let form = el('wa-form');
+  if (form) form.remove();
+  form = document.createElement('form');
+  form.id='wa-form'; form.method='POST';
+  form.action=CFG.webAppUrl; form.target='wa-iframe';
+  form.style.display='none';
+  const inp = document.createElement('input');
+  inp.type='hidden'; inp.name='data';
+  inp.value = JSON.stringify(payload);
+  form.appendChild(inp);
+  document.body.appendChild(form);
+  form.submit();
+}
+
 function buildPayload() {
   return {
-    tanggal   : v('tgl'), hari: v('hari'),
-    maskapai  : v('maskapai'), operator: v('operator'),
-    reg       : v('reg'), tipe: v('tipe'), rute: v('rute'),
-    flt_arr   : v('flt_arr'), flt_dep: v('flt_dep'),
-    route_arr : v('route_arr'), route_dep: v('route_dep'),
-    sta: v('sta'), ata: v('ata'), std: v('std'), atd: v('atd'),
-    pax_arr_d : n('pd'), pax_arr_a: n('pa'), pax_arr_b: n('pb'),
-    pax_dep_d : n('dd'), pax_dep_a: n('da'), pax_dep_b: n('db'),
-    bgs_arr   : n('bgs_a'), cgo_arr: n('cgo_a'),
-    bgs_dep   : n('bgs_d'), cgo_dep: n('cgo_d'),
-    remark    : v('remark'), catatan: v('catatan'), petugas: v('petugas'),
-    wa_number : CFG.waKakan,
+    tanggal:v('tgl'), hari:v('hari'),
+    maskapai:v('maskapai'), operator:v('operator'),
+    reg:v('reg'), tipe:v('tipe'), rute:v('rute'),
+    flt_arr:v('flt_arr'), flt_dep:v('flt_dep'),
+    route_arr:v('route_arr'), route_dep:v('route_dep'),
+    sta:v('sta'), ata:v('ata'), std:v('std'), atd:v('atd'),
+    pax_arr_d:n('pd'), pax_arr_a:n('pa'), pax_arr_b:n('pb'),
+    pax_dep_d:n('dd'), pax_dep_a:n('da'), pax_dep_b:n('db'),
+    bgs_arr:n('bgs_a'), cgo_arr:n('cgo_a'),
+    bgs_dep:n('bgs_d'), cgo_dep:n('cgo_d'),
+    remark:v('remark'), catatan:v('catatan'), petugas:v('petugas'),
+    wa_number:CFG.waKakan,
   };
 }
 
-function buildLaporan() {
-  const d = buildPayload();
-  const tgl = formatTgl(d.tanggal);
-  const arrT = d.pax_arr_d + d.pax_arr_a + d.pax_arr_b;
-  const depT = d.pax_dep_d + d.pax_dep_a + d.pax_dep_b;
-  return `LAPORAN PENERBANGAN HARIAN
-KANTOR UPBU H. AROEPPALA SELAYAR
-${d.hari}, ${tgl}
-
-Kepada Yth.
-Dirjen Perhubungan Udara • Sesditjen Perhubungan Udara
-Direktur Bandar Udara • Direktur Angkutan Udara
-Kepala Kantor OBU Wilayah V Makassar
-
-Dengan hormat, disampaikan laporan ${d.remark} ${d.maskapai}
-Rute ${d.rute} pada hari ${d.hari}, ${tgl} di Bandar Udara H. Aroeppala Selayar.
-
-OPERATOR : ${d.operator}
-Flt No   : ${d.flt_arr} - ${d.flt_dep}
-Reg      : ${d.reg}
-Type     : ${d.tipe}
-Opr      : ${d.maskapai}
-Rute     : ${d.rute}
-
---- ARRIVAL (${d.flt_arr}) ---
-Route ARR  : ${d.route_arr}
-STA / ATA  : ${d.sta} / ${d.ata} LT
-Pax Tiba   : ${d.pax_arr_d}/${d.pax_arr_a}/${d.pax_arr_b} = ${arrT} Org
-Bagasi     : ${d.bgs_arr} KG
-Kargo      : ${d.cgo_arr === 0 ? 'NIL' : d.cgo_arr + ' KG'}
-
---- DEPARTURE (${d.flt_dep}) ---
-Route DEP  : ${d.route_dep}
-STD / ATD  : ${d.std} / ${d.atd} LT
-Pax Brgkt  : ${d.pax_dep_d}/${d.pax_dep_a}/${d.pax_dep_b} = ${depT} Org
-Bagasi     : ${d.bgs_dep} KG
-Kargo      : ${d.cgo_dep === 0 ? 'NIL' : d.cgo_dep + ' KG'}
-
---- REKAPITULASI ---
-Total Pax Arrival    : ${arrT} Org
-Total Pax Departure  : ${depT} Org
-Grand Total Pax      : ${arrT + depT} Org
-Total Bagasi         : ${d.bgs_arr + d.bgs_dep} KG
-Total Kargo          : ${d.cgo_arr + d.cgo_dep === 0 ? 'NIL' : (d.cgo_arr + d.cgo_dep) + ' KG'}
-Status               : ${d.remark}
-
-Catatan:
-${d.catatan}
-
-Kegiatan berjalan aman dan lancar.
-Demikian dilaporkan, terima kasih.
-
-Hormat kami,
-Kepala UPBU H. Aroeppala Selayar`;
-}
-
-function buildWAMsg() {
-  const d = buildPayload();
-  const tgl = formatTgl(d.tanggal);
-  const arrT = d.pax_arr_d + d.pax_arr_a + d.pax_arr_b;
-  const depT = d.pax_dep_d + d.pax_dep_a + d.pax_dep_b;
-  const dA = hitungDelay(d.sta, d.ata);
-  const dD = hitungDelay(d.std, d.atd);
-  return `✈️ *LAPORAN PENERBANGAN HARIAN*
-*UPBU H. Aroeppala Selayar*
-📅 ${d.hari}, ${tgl}
-
-*${d.maskapai} — ${d.flt_arr}/${d.flt_dep}*
-🛩 ${d.tipe} | ${d.reg}
-🗺 Rute: ${d.rute}
-
-━━━━━━━━━━━━━━━
-🛬 *ARRIVAL* (${d.flt_arr})
-• STA/ATA: ${d.sta}/${d.ata} LT${dA > 0 ? ` _(delay ${dA} mnt)_` : ' ✅'}
-• Pax: ${arrT} Org (D:${d.pax_arr_d} A:${d.pax_arr_a} B:${d.pax_arr_b})
-• Bagasi: ${d.bgs_arr} kg | Kargo: ${d.cgo_arr === 0 ? 'NIL' : d.cgo_arr + ' kg'}
-
-🛫 *DEPARTURE* (${d.flt_dep})
-• STD/ATD: ${d.std}/${d.atd} LT${dD > 0 ? ` _(delay ${dD} mnt)_` : ' ✅'}
-• Pax: ${depT} Org (D:${d.pax_dep_d} A:${d.pax_dep_a} B:${d.pax_dep_b})
-• Bagasi: ${d.bgs_dep} kg | Kargo: ${d.cgo_dep === 0 ? 'NIL' : d.cgo_dep + ' kg'}
-
-━━━━━━━━━━━━━━━
-📊 *REKAPITULASI*
-• Grand Total Pax : ${arrT + depT} Org
-• Total Bagasi    : ${d.bgs_arr + d.bgs_dep} kg
-• Status          : ${d.remark} ✅
-
-📝 _${d.catatan}_
-
-_Dilaporkan oleh: ${d.petugas || 'Unit LLAU'}_
-_UPBU Kelas III H. Aroeppala Selayar_`;
-}
-
-// ─── SUBMIT KE SHEETS ──────────────────────────────────────────
-async function submitData() {
-  calc();
-  const payload = buildPayload();
-
-  // Validasi
-  if (!payload.tanggal) { showStatus('submit-status','err','Tanggal wajib diisi.'); return; }
-  if (!payload.flt_arr || !payload.flt_dep) { showStatus('submit-status','err','Nomor flight ARR/DEP wajib diisi.'); return; }
-
-  // Update preview & WA dulu
-  el('preview-text').textContent = buildLaporan();
-  el('wa-text').textContent = buildWAMsg();
-
-  if (!CFG.webAppUrl) {
-    showStatus('submit-status','err','URL Web App belum diisi. Klik "Konfigurasi" di pojok kanan atas.');
-    return;
+function showNotif(msg, type) {
+  let notif = el('notif-bar');
+  if (!notif) {
+    notif = document.createElement('div');
+    notif.id = 'notif-bar';
+    notif.style.cssText = 'position:fixed;top:16px;right:16px;z-index:9999;padding:12px 18px;border-radius:9px;font-size:13px;font-weight:500;max-width:320px;box-shadow:0 4px 20px rgba(0,0,0,.3)';
+    document.body.appendChild(notif);
   }
+  notif.style.background = type==='ok' ? '#1D9E75' : '#E24B4A';
+  notif.style.color = '#fff';
+  notif.style.opacity = '1';
+  notif.textContent = msg;
+  setTimeout(() => { notif.style.opacity='0'; }, 3500);
+}
 
-  showStatus('submit-status','loading','⏳ Mengirim data ke Google Sheets...');
+function buildPDF() {
+  const tgl=v('tgl'), tglFmt=formatTgl(tgl);
+  const arrT=n('pd')+n('pa')+n('pb');
+  const depT=n('dd')+n('da')+n('db');
+  const dA=delay(v('sta'),v('ata'));
+  const dD=delay(v('std'),v('atd'));
 
-  // Teknik: gunakan hidden form + iframe untuk bypass CORS
-  // Apps Script menerima ini sebagai form POST biasa, bisa baca data, dan kirim WA
-  try {
-    // Buat iframe tersembunyi sebagai target form
-    let iframe = document.getElementById('submit-iframe');
-    if (!iframe) {
-      iframe = document.createElement('iframe');
-      iframe.id   = 'submit-iframe';
-      iframe.name = 'submit-iframe';
-      iframe.style.display = 'none';
-      document.body.appendChild(iframe);
+  el('p-tgl').textContent=tglFmt;
+  el('p-movement-title').textContent='Movement Report ' + tglFmt;
+  el('p-pax-arr-s').textContent=n('pd')+'/'+n('pa')+'/'+n('pb');
+  el('p-pax-dep-s').textContent=n('dd')+'/'+n('da')+'/'+n('db');
+  el('p-bgs-s').textContent=n('bgs_a')+n('bgs_d');
+  el('p-catatan').textContent=v('catatan');
+  el('p-kakan').textContent=v('kakan');
+  el('p-nip').textContent=v('nip')?'NIP. '+v('nip'):'';
+
+  const fotoSection=el('p-foto-section'), fotoGrid=el('p-foto-grid');
+  if (photos.length > 0) {
+    fotoSection.style.display='block';
+    fotoGrid.innerHTML = photos.map(p =>
+      '<div><img class="pf-img" src="'+p.dataUrl+'" alt="'+p.label+'"/><div class="pf-cat">'+p.label+'</div></div>'
+    ).join('');
+    for (let i=0; i<6-photos.length; i++) {
+      fotoGrid.innerHTML += '<div><div class="pf-img-placeholder">—</div></div>';
     }
-
-    // Buat form tersembunyi
-    let form = document.getElementById('submit-form');
-    if (form) form.remove();
-    form = document.createElement('form');
-    form.id     = 'submit-form';
-    form.method = 'POST';
-    form.action = CFG.webAppUrl;
-    form.target = 'submit-iframe';
-    form.style.display = 'none';
-
-    // Masukkan semua data sebagai satu field JSON
-    const input = document.createElement('input');
-    input.type  = 'hidden';
-    input.name  = 'data';
-    input.value = JSON.stringify(payload);
-    form.appendChild(input);
-    document.body.appendChild(form);
-
-    // Submit form
-    form.submit();
-
-    // Tampilkan sukses setelah 2 detik (iframe load)
-    setTimeout(() => {
-      showStatus('submit-status','ok',
-        `✅ Data terkirim ke Google Sheets!\n` +
-        `Tanggal  : ${payload.hari}, ${formatTgl(payload.tanggal)}\n` +
-        `Flight   : ${payload.flt_arr}/${payload.flt_dep}\n` +
-        `Pax      : ${payload.pax_arr_d+payload.pax_arr_a+payload.pax_arr_b + payload.pax_dep_d+payload.pax_dep_a+payload.pax_dep_b} org\n` +
-        `WhatsApp : otomatis terkirim ke Kepala Kantor ✓\n\n` +
-        `Cek Google Sheets sheet "Data Harian" untuk konfirmasi.`
-      );
-    }, 2500);
-
-  } catch(err) {
-    showStatus('submit-status','err','Gagal mengirim: ' + err.message);
-  }
-}
-
-// ─── NAVIGATION ────────────────────────────────────────────────
-function switchTab(t) {
-  ['input','laporan','wa','setup'].forEach(id => {
-    el('tab-'+id)?.classList.toggle('active', id===t);
-  });
-  document.querySelectorAll('.tab').forEach((b,i) => {
-    b.classList.toggle('active', ['input','laporan','wa','setup'][i]===t);
-  });
-}
-
-function generateAll() {
-  calc(); calcDelay();
-  el('preview-text').textContent = buildLaporan();
-  el('wa-text').textContent = buildWAMsg();
-}
-
-function goLaporan() { generateAll(); switchTab('laporan'); }
-function goWA()      { generateAll(); switchTab('wa'); }
-
-function copyPreview() {
-  navigator.clipboard.writeText(el('preview-text').textContent)
-    .then(() => alert('Teks laporan berhasil disalin!'));
-}
-
-function copyWA() {
-  navigator.clipboard.writeText(el('wa-text').textContent)
-    .then(() => alert('Pesan WhatsApp berhasil disalin!'));
-}
-
-function printLaporan() {
-  const w = window.open('','_blank');
-  w.document.write(`<pre style="font-family:monospace;font-size:12px;padding:2rem">${el('preview-text').textContent}</pre>`);
-  w.print();
-}
-
-function kirimWA(which) {
-  const txt = el('wa-text').textContent || buildWAMsg();
-  const num = (which===1 ? v('wa-kakan') : v('wa-other')).replace(/\D/g,'');
-  if (!num) {
-    navigator.clipboard.writeText(txt).then(() =>
-      alert('Nomor belum diisi. Pesan WA sudah disalin — buka WhatsApp manual.')
-    );
-    return;
-  }
-  window.open(`https://wa.me/${num}?text=${encodeURIComponent(txt)}`, '_blank');
-}
-
-// ─── MODAL / CONFIG ────────────────────────────────────────────
-function openModal() {
-  el('modal-url').value = CFG.webAppUrl;
-  el('modal-wa').value  = CFG.waKakan;
-  el('modal-token').value = CFG.waToken;
-  el('conn-modal').classList.add('open');
-}
-function closeModal() { el('conn-modal').classList.remove('open'); }
-
-async function saveConfig() {
-  const url   = el('modal-url').value.trim();
-  const wa    = el('modal-wa').value.trim();
-  const token = el('modal-token').value.trim();
-
-  if (url && !url.startsWith('https://script.google.com')) {
-    showStatus('modal-status','err','URL tidak valid. Harus dimulai dengan https://script.google.com/...');
-    return;
+  } else {
+    fotoSection.style.display='none';
   }
 
-  showStatus('modal-status','loading','Memeriksa koneksi...');
+  const aCls=dA>0?'td-delay':'';
+  el('p-arr-body').innerHTML='<tr><td>1</td><td>'+tgl+'</td><td class="td-bold">'+v('route_arr')+'</td><td>'+v('maskapai')+'</td><td>'+v('reg')+'</td><td>'+v('tipe')+'</td><td class="td-bold">'+v('flt_arr')+'</td><td>'+v('sta')+'</td><td class="'+aCls+'">'+v('ata')+(dA>0?' (+'+dA+')':'')+'</td><td>'+n('pd')+'</td><td>'+n('pa')+'</td><td>'+n('pb')+'</td><td class="td-bold">'+arrT+'</td><td>'+n('bgs_a')+'</td><td>'+(n('cgo_a')||'NIL')+'</td><td>A</td><td>'+v('remark')+'</td></tr>';
 
-  if (url) {
-    try {
-      const r = await fetch(url + '?action=rekap');
-      const j = await r.json();
-      if (j.status !== 'ok') throw new Error(j.msg);
-      showStatus('modal-status','ok',`✅ Terhubung! ${j.total_flight} penerbangan di Sheets.`);
-    } catch(e) {
-      showStatus('modal-status','err','Koneksi gagal: ' + e.message + '\nPastikan URL benar dan Web App sudah di-deploy.');
-      return;
-    }
-  }
-
-  CFG.webAppUrl = url;
-  CFG.waKakan   = wa;
-  CFG.waToken   = token;
-  localStorage.setItem('pfi_url',   url);
-  localStorage.setItem('pfi_wa',    wa);
-  localStorage.setItem('pfi_token', token);
-
-  if (wa) document.getElementById('wa-kakan').value = wa;
-  updateConnStatus();
-
-  setTimeout(closeModal, 1200);
+  const dCls=dD>0?'td-delay':'';
+  el('p-dep-body').innerHTML='<tr><td>1</td><td>'+tgl+'</td><td class="td-bold">'+v('route_dep')+'</td><td>'+v('maskapai')+'</td><td>'+v('reg')+'</td><td>'+v('tipe')+'</td><td class="td-bold">'+v('flt_dep')+'</td><td>'+v('std')+'</td><td class="'+dCls+'">'+v('atd')+(dD>0?' (+'+dD+')':'')+'</td><td>'+n('dd')+'</td><td>'+n('da')+'</td><td>'+n('db')+'</td><td class="td-bold">'+depT+'</td><td>'+n('bgs_d')+'</td><td>'+(n('cgo_d')||'NIL')+'</td><td>D</td><td>'+v('remark')+'</td></tr>';
 }
 
-function updateConnStatus() {
-  const dot   = el('conn-dot');
-  const label = el('conn-label');
-  const s3num = el('step3-num');
-  const s3st  = el('step3-status');
-  const s4st  = el('step4-status');
+function previewPDF() {
+  buildPDF();
+  el('pdf-wrap').style.display='block';
+  el('screen').style.display='none';
+  window.scrollTo(0,0);
+}
 
+function generateAndPrint() {
+  if (!v('tgl')) { showNotif('Tanggal wajib diisi!','err'); return; }
+  buildPDF();
+  // Kirim WA + simpan ke Sheets otomatis bersamaan
   if (CFG.webAppUrl) {
-    dot.className = 'dot ok';
-    label.textContent = 'Terhubung';
-    if (s3num) { s3num.classList.add('done'); s3num.textContent = '✓'; }
-    if (s3st)  s3st.innerHTML = '<span style="color:var(--green)">tersimpan ✓</span>';
+    kirimWAOtomatis(buildPayload());
+    showNotif('Data tersimpan & WA terkirim ke Kepala Kantor!','ok');
+  } else {
+    showNotif('Isi konfigurasi dulu agar WA terkirim otomatis','err');
   }
-  if (CFG.waToken) {
-    if (s4st) s4st.innerHTML = '<span style="color:var(--green)">aktif ✓</span>';
-  }
+  el('pdf-wrap').style.display='block';
+  el('screen').style.display='none';
+  setTimeout(() => window.print(), 700);
 }
+
+function backToForm() {
+  el('pdf-wrap').style.display='none';
+  el('screen').style.display='block';
+  window.scrollTo(0,0);
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  const today = new Date().toISOString().split('T')[0];
+  el('tgl').value = today;
+  onTgl(); calc();
+  updateCfgStatus();
+  if (!CFG.webAppUrl) setTimeout(()=>{ el('cfg-modal').style.display='flex'; }, 500);
+});
 </script>
 </body>
 </html>
