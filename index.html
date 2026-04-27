@@ -718,6 +718,181 @@ async function generateAndPrint() {
   setTimeout(() => window.print(), 1500);
 }
 
+
+async function buatGambarLaporan() {
+  // Buat gambar laporan ringkas pakai Canvas API murni — tidak ada request eksternal
+  const W = 900, H = 1200;
+  const cv = document.createElement('canvas');
+  cv.width = W; cv.height = H;
+  const ctx = cv.getContext('2d');
+
+  const NAVY  = '#1A3A5C';
+  const GOLD  = '#E6A817';
+  const WHITE = '#FFFFFF';
+  const LGRAY = '#F4F6F9';
+  const DGRAY = '#7A8FA6';
+
+  // Helper functions
+  function rect(x,y,w,h,color){ ctx.fillStyle=color; ctx.fillRect(x,y,w,h); }
+  function text(t,x,y,size,color,align='left',bold=false){
+    ctx.font=(bold?'bold ':'')+size+'px Arial';
+    ctx.fillStyle=color; ctx.textAlign=align; ctx.fillText(t,x,y);
+  }
+  function roundRect(x,y,w,h,r,color){
+    ctx.fillStyle=color; ctx.beginPath();
+    ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y);
+    ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+    ctx.lineTo(x+w,y+h-r); ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+    ctx.lineTo(x+r,y+h); ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+    ctx.lineTo(x,y+r); ctx.quadraticCurveTo(x,y,x+r,y);
+    ctx.closePath(); ctx.fill();
+  }
+  function line(x1,y1,x2,y2,color,w=1){
+    ctx.strokeStyle=color; ctx.lineWidth=w;
+    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+  }
+  function wrapText(t,x,y,maxW,lineH,size,color){
+    ctx.font=size+'px Arial'; ctx.fillStyle=color; ctx.textAlign='left';
+    const words=t.split(' '); let line='';
+    for(let w of words){
+      const test=line+w+' ';
+      if(ctx.measureText(test).width>maxW && line!==''){
+        ctx.fillText(line,x,y); line=w+' '; y+=lineH;
+      } else line=test;
+    }
+    ctx.fillText(line,x,y);
+    return y;
+  }
+
+  // Data dari form
+  const tglFmt  = formatTgl(v('tgl'));
+  const arrT    = n('pd')+n('pa')+n('pb');
+  const depT    = n('dd')+n('da')+n('db');
+  const dA      = delay(v('sta'),v('ata'));
+  const dD      = delay(v('std'),v('atd'));
+
+  // ── HEADER NAVY ──────────────────────────────────────────────
+  rect(0,0,W,100,NAVY);
+  // Logo circle
+  ctx.fillStyle=GOLD; ctx.beginPath(); ctx.arc(54,50,32,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle=NAVY; ctx.font='bold 13px Arial'; ctx.textAlign='center';
+  ctx.fillText('UPBU',54,46); ctx.fillText('KSR',54,62);
+  // Title
+  text('Kantor UPBU H. Aroeppala Selayar',100,40,16,WHITE,'left',true);
+  text('Direktorat Jenderal Perhubungan Udara — Kementerian Perhubungan RI',100,62,11,DGRAY);
+  // Date
+  ctx.textAlign='right';
+  text('Tanggal:',W-20,36,10,DGRAY,'right');
+  text(tglFmt,W-20,56,13,GOLD,'right',true);
+
+  // ── GOLD STRIP ───────────────────────────────────────────────
+  rect(0,100,W,5,GOLD);
+
+  // ── TITLE BLOCK ──────────────────────────────────────────────
+  rect(0,105,W,70,LGRAY);
+  text('LAPORAN PENERBANGAN HARIAN',W/2,138,20,NAVY,'center',true);
+  text('UPBU H. Aroeppala Selayar — Unit LLAU',W/2,162,12,GOLD,'center',true);
+  line(0,175,W,175,GOLD,2);
+
+  // ── FOTO SECTION ─────────────────────────────────────────────
+  let y = 185;
+  if (photos.length > 0) {
+    rect(0,y,W,30,NAVY);
+    text('DOKUMENTASI PENERBANGAN',20,y+20,12,GOLD,'left',true);
+    y += 35;
+    const cols = Math.min(photos.length, 3);
+    const imgW = Math.floor((W-40-(cols-1)*10)/cols);
+    const imgH = Math.floor(imgW*3/4);
+    const promises = photos.slice(0,cols).map((p,i) => new Promise(res => {
+      const img = new Image();
+      img.onload = () => {
+        const x = 20 + i*(imgW+10);
+        // Draw image
+        ctx.drawImage(img, x, y, imgW, imgH);
+        // Label
+        roundRect(x, y+imgH-24, imgW, 24, 0, 'rgba(0,0,0,0.6)');
+        ctx.font='bold 11px Arial'; ctx.fillStyle=WHITE; ctx.textAlign='center';
+        ctx.fillText(p.label, x+imgW/2, y+imgH-9);
+        res();
+      };
+      img.onerror = res;
+      img.src = p.dataUrl;
+    }));
+    await Promise.all(promises);
+    y += imgH + 15;
+    line(0,y,W,y,'#ddd',1); y+=10;
+  }
+
+  // ── SUMMARY CARDS (gold) ──────────────────────────────────────
+  rect(0,y,W,130,GOLD);
+  text('Movement Report — '+tglFmt,W/2,y+26,14,NAVY,'center',true);
+  y += 36;
+  const cards = [
+    {label:'Pesawat Datang/Berangkat', val:'1 / 1'},
+    {label:'Penumpang Datang', val:n('pd')+'/'+n('pa')+'/'+n('pb')},
+    {label:'Penumpang Berangkat', val:n('dd')+'/'+n('da')+'/'+n('db')},
+    {label:'Total Bagasi (kg)', val:String(n('bgs_a')+n('bgs_d'))},
+  ];
+  const cW=(W-60)/4, cH=70;
+  cards.forEach((c,i)=>{
+    const cx=20+i*(cW+13), cy=y;
+    roundRect(cx,cy,cW,cH,8,'rgba(255,255,255,0.45)');
+    ctx.font='bold 22px Arial'; ctx.fillStyle=NAVY; ctx.textAlign='center';
+    ctx.fillText(c.val, cx+cW/2, cy+36);
+    ctx.font='9px Arial'; ctx.fillStyle='#333';
+    ctx.fillText(c.label, cx+cW/2, cy+54);
+  });
+  y += cH + 20;
+
+  // ── DETAIL TABLE ──────────────────────────────────────────────
+  const drawRow = (label,val,yy,bg)=>{
+    rect(20,yy,W-40,28,bg);
+    text(label,30,yy+19,11,DGRAY,'left',true);
+    text(val,W-30,yy+19,11,NAVY,'right',true);
+    line(20,yy+28,W-20,yy+28,'#eee',1);
+    return yy+28;
+  };
+
+  // ARR header
+  roundRect(20,y,180,26,4,NAVY);
+  text('🛬  ARRIVAL ('+v('flt_arr')+')',30,y+18,11,WHITE,'left',true);
+  y+=30;
+  y=drawRow('Route ARR',v('route_arr'),y,WHITE);
+  y=drawRow('STA / ATA',v('sta')+' / '+v('ata')+' LT'+(dA>0?' (delay '+dA+' mnt)':'  ✓'),y,dA>0?'#FFF8E1':WHITE);
+  y=drawRow('Pax Tiba',n('pd')+'/'+n('pa')+'/'+n('pb')+' = '+arrT+' Org',y,WHITE);
+  y=drawRow('Bagasi Tiba',n('bgs_a')+' kg',y,LGRAY);
+  y+=8;
+
+  // DEP header
+  roundRect(20,y,200,26,4,'#245080');
+  text('🛫  DEPARTURE ('+v('flt_dep')+')',30,y+18,11,WHITE,'left',true);
+  y+=30;
+  y=drawRow('Route DEP',v('route_dep'),y,WHITE);
+  y=drawRow('STD / ATD',v('std')+' / '+v('atd')+' LT'+(dD>0?' (delay '+dD+' mnt)':'  ✓'),y,dD>0?'#FFF8E1':WHITE);
+  y=drawRow('Pax Berangkat',n('dd')+'/'+n('da')+'/'+n('db')+' = '+depT+' Org',y,WHITE);
+  y=drawRow('Bagasi Berangkat',n('bgs_d')+' kg',y,LGRAY);
+  y+=10;
+
+  // ── CATATAN ───────────────────────────────────────────────────
+  line(20,y,W-20,y,GOLD,2); y+=14;
+  text('Catatan:',20,y,11,NAVY,'left',true); y+=18;
+  y = wrapText(v('catatan'),20,y,W-40,18,11,DGRAY) + 20;
+
+  // ── REMARK ────────────────────────────────────────────────────
+  roundRect(20,y,W-40,36,8,NAVY);
+  text('Status: '+v('remark'),W/2,y+23,13,GOLD,'center',true);
+  y+=50;
+
+  // ── FOOTER ───────────────────────────────────────────────────
+  const footY = H-55;
+  rect(0,footY,W,55,NAVY);
+  text('BANDAR UDARA H. AROEPPALA',W/2,footY+20,13,GOLD,'center',true);
+  text('☎ 0852-2034-8115  |  aroeppalaairport@gmail.com  |  Jl. Poros Padang, Kab. Kepulauan Selayar',W/2,footY+38,9,'rgba(255,255,255,0.65)','center');
+  text('Dibuat otomatis oleh Post-Flight Intelligence System',W/2,footY+52,8,'rgba(255,255,255,0.4)','center');
+
+  return cv.toDataURL('image/jpeg',0.88).split(',')[1];
+}
+
 async function kirimGambarWA(base64, nomor) {
   // Upload gambar ke Fonnte lalu kirim
   const caption =
