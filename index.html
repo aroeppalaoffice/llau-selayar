@@ -664,51 +664,56 @@ function previewPDF() {
 async function generateAndPrint() {
   if (!v('tgl')) { showNotif('Tanggal wajib diisi!', 'err'); return; }
 
-  // 1. Build PDF page
+  // 1. Build PDF content dulu
   buildPDF();
-  el('pdf-wrap').style.display = 'block';
-  el('screen').style.display  = 'none';
-  window.scrollTo(0, 0);
 
-  // 2. Kirim teks WA + simpan Sheets dulu (tidak tunggu screenshot)
+  // 2. Kirim teks WA + simpan Sheets (tidak perlu tunggu)
   if (CFG.webAppUrl) {
     kirimWAOtomatis(buildPayload());
   }
 
-  // 3. Screenshot halaman PDF → kirim sebagai gambar WA
+  // 3. Tampilkan PDF page
+  const pdfWrap = el('pdf-wrap');
+  const screen  = el('screen');
+  if (pdfWrap) pdfWrap.style.display = 'block';
+  if (screen)  screen.style.display  = 'none';
+  window.scrollTo(0, 0);
+
+  // 4. Screenshot & kirim gambar WA
   if (CFG.webAppUrl && CFG.waKakan && CFG.waToken) {
     showNotif('⏳ Membuat screenshot laporan...', 'ok');
     try {
-      await new Promise(r => setTimeout(r, 800)); // tunggu render selesai
-      const pdfEl = el('pdf-page');
+      // Tunggu render PDF selesai sebelum screenshot
+      await new Promise(r => setTimeout(r, 1200));
+
+      const pdfEl = document.querySelector('.pdf-page');
+      if (!pdfEl) throw new Error('Elemen PDF tidak ditemukan');
+
       const canvas = await html2canvas(pdfEl, {
-        scale      : 2,
-        useCORS    : true,
-        allowTaint : true,
-        backgroundColor: '#ffffff',
-        logging    : false,
-        windowWidth: pdfEl.scrollWidth,
-        windowHeight: pdfEl.scrollHeight,
+        scale           : 1.5,
+        useCORS         : true,
+        allowTaint      : true,
+        backgroundColor : '#ffffff',
+        logging         : false,
       });
 
-      // Convert canvas ke base64
-      const imageData = canvas.toDataURL('image/jpeg', 0.85);
+      const imageData = canvas.toDataURL('image/jpeg', 0.82);
       const base64    = imageData.split(',')[1];
 
-      // Kirim gambar via Fonnte
       await kirimGambarWA(base64, CFG.waKakan);
-      showNotif('✅ Laporan PDF + teks WA terkirim ke Kepala Kantor!', 'ok');
+      showNotif('✅ Screenshot laporan terkirim ke WA Kepala Kantor!', 'ok');
     } catch(err) {
-      showNotif('⚠ Screenshot gagal: ' + err.message + ' — teks WA tetap terkirim', 'err');
+      console.error('Screenshot error:', err);
+      showNotif('⚠ ' + err.message + ' — teks WA tetap terkirim', 'err');
     }
   } else if (CFG.webAppUrl) {
-    showNotif('✅ Data & teks WA terkirim! (Isi token Fonnte untuk kirim gambar)', 'ok');
+    showNotif('✅ Data & teks WA terkirim!', 'ok');
   } else {
-    showNotif('⚠ Isi konfigurasi dulu agar WA terkirim otomatis', 'err');
+    showNotif('⚠ Isi konfigurasi dulu agar WA terkirim', 'err');
   }
 
-  // 4. Print dialog
-  setTimeout(() => window.print(), 1200);
+  // 5. Print dialog
+  setTimeout(() => window.print(), 1500);
 }
 
 async function kirimGambarWA(base64, nomor) {
