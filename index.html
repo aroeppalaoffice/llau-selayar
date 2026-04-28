@@ -3,259 +3,435 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Generator Laporan PDF — UPBU H. Aroeppala Selayar</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<title>Post-Flight Intelligence — UPBU H. Aroeppala Selayar</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
 <style>
-/* ══════════════════════════════════════════
-   SCREEN UI
-══════════════════════════════════════════ */
+:root{
+  --biru:#003580;
+  --biru2:#0050B3;
+  --biru3:#1677FF;
+  --biru-muda:#E6F0FF;
+  --biru-terang:#BAD7FF;
+  --merah:#D0021B;
+  --putih:#FFFFFF;
+  --abu:#F4F6FA;
+  --abu2:#E8ECF4;
+  --abu3:#C8CDD8;
+  --teks:#1A2340;
+  --teks2:#4B5675;
+  --teks3:#8892A4;
+  --border:#D0D8EC;
+  --shadow:0 2px 12px rgba(0,53,128,0.08);
+  --shadow-md:0 4px 24px rgba(0,53,128,0.12);
+  --r:10px;
+  --r-lg:16px;
+}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:Arial,sans-serif;background:#0F2540;color:#fff;min-height:100vh}
+html{scroll-behavior:smooth}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--abu);color:var(--teks);min-height:100vh;font-size:14px}
 
-.screen{padding:1.25rem;max-width:860px;margin:0 auto}
-.top-bar{display:flex;align-items:center;gap:12px;margin-bottom:1.25rem;padding-bottom:1rem;border-bottom:1px solid rgba(255,255,255,0.08)}
-.top-icon{width:42px;height:42px;background:#E6A817;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#0F2540;flex-shrink:0}
-.top-title{font-size:16px;font-weight:600}
-.top-sub{font-size:11px;color:rgba(255,255,255,.5);margin-top:1px}
+/* ── TOPBAR ── */
+.topbar{
+  background:var(--biru);
+  padding:0 1.5rem;
+  display:flex;align-items:center;justify-content:space-between;
+  height:56px;position:sticky;top:0;z-index:100;
+  box-shadow:0 2px 8px rgba(0,0,0,0.2);
+}
+.topbar-left{display:flex;align-items:center;gap:12px}
+.logo-kemenhub{
+  width:36px;height:36px;border-radius:6px;overflow:hidden;
+  background:var(--putih);display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.logo-kemenhub svg{width:28px;height:28px}
+.topbar-title{color:var(--putih)}
+.topbar-title .main{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;letter-spacing:.3px;line-height:1.2}
+.topbar-title .sub{font-size:10px;opacity:.7;letter-spacing:.3px}
+.conn-badge{
+  display:flex;align-items:center;gap:6px;
+  background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);
+  border-radius:20px;padding:5px 12px;cursor:pointer;
+  font-size:11px;color:rgba(255,255,255,0.85);
+  transition:background .15s;
+}
+.conn-badge:hover{background:rgba(255,255,255,0.2)}
+.conn-dot{width:6px;height:6px;border-radius:50%;background:#FFA940}
+.conn-dot.ok{background:#52C41A}
 
-.scard{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);border-radius:12px;padding:1.1rem;margin-bottom:.9rem}
-.scard-title{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#E6A817;margin-bottom:.9rem;display:flex;align-items:center;gap:8px}
-.scard-title::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.06)}
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+/* ── HEADER STRIP ── */
+.header-strip{
+  background:linear-gradient(135deg,var(--biru) 0%,var(--biru2) 100%);
+  padding:1.5rem;
+  display:flex;align-items:center;gap:1rem;
+  border-bottom:3px solid var(--merah);
+}
+.header-icon{
+  width:52px;height:52px;border-radius:12px;
+  background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.2);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  font-size:22px;
+}
+.header-text .title{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--putih);letter-spacing:.5px}
+.header-text .sub{font-size:11px;color:rgba(255,255,255,0.7);margin-top:2px;letter-spacing:.3px}
+.header-badges{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+.hbadge{
+  font-size:10px;font-weight:600;padding:2px 8px;border-radius:10px;letter-spacing:.3px;
+  background:rgba(255,255,255,0.15);color:rgba(255,255,255,0.9);border:1px solid rgba(255,255,255,0.2);
+}
+.hbadge.red{background:var(--merah);border-color:var(--merah);color:#fff}
+
+/* ── TABS ── */
+.tabs{
+  background:var(--putih);border-bottom:1px solid var(--border);
+  display:flex;overflow-x:auto;padding:0 1rem;
+  box-shadow:var(--shadow);
+}
+.tab{
+  padding:14px 16px;font-size:13px;font-weight:500;color:var(--teks2);
+  border:none;background:transparent;cursor:pointer;
+  border-bottom:2px solid transparent;white-space:nowrap;
+  transition:all .15s;display:flex;align-items:center;gap:6px;
+}
+.tab:hover{color:var(--biru2)}
+.tab.active{color:var(--biru);border-bottom-color:var(--biru);font-weight:600}
+.tab-icon{font-size:14px}
+
+/* ── MAIN ── */
+.main{max-width:900px;margin:0 auto;padding:1.25rem 1rem}
+.panel{display:none}.panel.active{display:block}
+
+/* ── CARDS ── */
+.card{
+  background:var(--putih);border:1px solid var(--border);
+  border-radius:var(--r-lg);padding:1.25rem;margin-bottom:1rem;
+  box-shadow:var(--shadow);
+}
+.card-header{
+  display:flex;align-items:center;gap:10px;margin-bottom:1rem;
+  padding-bottom:.75rem;border-bottom:1px solid var(--abu2);
+}
+.card-icon{
+  width:32px;height:32px;border-radius:8px;background:var(--biru-muda);
+  display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;
+}
+.card-title{font-size:13px;font-weight:600;color:var(--biru);letter-spacing:.2px}
+.card-sub{font-size:11px;color:var(--teks3);margin-top:1px}
+
+/* ── GRID ── */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
 .g4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
 .full{grid-column:1/-1}
-.fld{display:flex;flex-direction:column;gap:4px}
-.fld label{font-size:11px;color:rgba(255,255,255,.45)}
-.fld input,.fld select,.fld textarea{
-  background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.11);
-  border-radius:7px;padding:7px 10px;font-size:12.5px;color:#fff;
-  font-family:Arial,sans-serif;width:100%;transition:border-color .15s}
-.fld input:focus,.fld select:focus,.fld textarea:focus{outline:none;border-color:#E6A817}
-.fld select option{background:#1A3A5C}
-.fld input[readonly]{opacity:.5}
-.fld textarea{resize:vertical;min-height:52px;line-height:1.5}
 
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:.9rem}
-.stat{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:9px;padding:10px;text-align:center}
-.stat .n{font-size:20px;font-weight:600;color:#E6A817}
-.stat .l{font-size:10px;color:rgba(255,255,255,.45);margin-top:3px}
-
-/* Upload zone */
-.upload-zone{
-  border:1.5px dashed rgba(255,255,255,.2);border-radius:10px;
-  padding:1.25rem;text-align:center;cursor:pointer;transition:all .15s;
-  background:rgba(255,255,255,.03)
+/* ── FORM FIELDS ── */
+.fld{display:flex;flex-direction:column;gap:5px}
+.fld label{
+  font-size:11px;font-weight:600;color:var(--teks2);
+  letter-spacing:.3px;text-transform:uppercase;
 }
-.upload-zone:hover{background:rgba(255,255,255,.07);border-color:rgba(230,168,23,.5)}
+.fld input,.fld select,.fld textarea{
+  border:1.5px solid var(--border);border-radius:var(--r);
+  padding:9px 12px;font-size:13px;color:var(--teks);
+  background:var(--putih);font-family:'Plus Jakarta Sans',sans-serif;
+  width:100%;transition:border-color .15s,box-shadow .15s;
+}
+.fld input:focus,.fld select:focus,.fld textarea:focus{
+  outline:none;border-color:var(--biru3);
+  box-shadow:0 0 0 3px rgba(22,119,255,0.1);
+}
+.fld input[readonly]{background:var(--abu);color:var(--teks2)}
+.fld textarea{resize:vertical;min-height:56px;line-height:1.5}
+.fld select{cursor:pointer}
+
+/* ── SECTION LABEL ── */
+.section-label{
+  font-size:10px;font-weight:700;color:var(--biru);letter-spacing:.8px;
+  text-transform:uppercase;margin-bottom:8px;margin-top:4px;
+  display:flex;align-items:center;gap:6px;
+}
+.section-label::after{content:'';flex:1;height:1px;background:var(--biru-terang)}
+
+/* ── STATS ROW ── */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:1rem}
+.stat{
+  background:var(--putih);border:1px solid var(--border);
+  border-radius:var(--r);padding:12px 10px;text-align:center;
+  box-shadow:var(--shadow);position:relative;overflow:hidden;
+}
+.stat::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:var(--biru);
+}
+.stat .n{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;color:var(--biru);line-height:1}
+.stat .l{font-size:10px;color:var(--teks3);margin-top:4px;font-weight:500;letter-spacing:.2px}
+
+/* ── ARRIVAL/DEPARTURE CARDS ── */
+.flight-card{
+  background:var(--putih);border:1px solid var(--border);
+  border-radius:var(--r-lg);padding:1rem;
+  box-shadow:var(--shadow);
+}
+.flight-card.arr{border-top:3px solid #1677FF}
+.flight-card.dep{border-top:3px solid #003580}
+.flight-label{
+  font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;
+  margin-bottom:.75rem;display:flex;align-items:center;gap:6px;
+}
+.flight-label.arr{color:#1677FF}
+.flight-label.dep{color:#003580}
+.flt-badge{
+  font-size:9px;padding:2px 7px;border-radius:8px;font-weight:600;
+}
+.flt-badge.arr{background:#E6F0FF;color:#1677FF}
+.flt-badge.dep{background:#E6EBF5;color:#003580}
+
+/* ── DELAY INDICATOR ── */
+.delay-info{
+  font-size:11px;font-weight:600;color:#FA8C16;
+  background:#FFF7E6;border:1px solid #FFD591;border-radius:6px;
+  padding:4px 10px;margin-top:4px;display:none;
+}
+
+/* ── BUTTONS ── */
+.btn-row{display:flex;gap:8px;margin-top:1rem;flex-wrap:wrap}
+.btn{
+  flex:1;min-width:120px;padding:11px 16px;border-radius:var(--r);
+  font-size:13px;font-weight:600;cursor:pointer;border:none;
+  font-family:'Plus Jakarta Sans',sans-serif;
+  transition:all .15s;display:flex;align-items:center;justify-content:center;gap:6px;
+  letter-spacing:.2px;
+}
+.btn-primary{background:var(--biru);color:#fff;box-shadow:0 2px 8px rgba(0,53,128,0.3)}
+.btn-primary:hover{background:var(--biru2);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,53,128,0.4)}
+.btn-secondary{background:var(--abu);color:var(--teks);border:1.5px solid var(--border)}
+.btn-secondary:hover{background:var(--abu2)}
+.btn-wa{background:#25D366;color:#fff;box-shadow:0 2px 8px rgba(37,211,102,0.3)}
+.btn-wa:hover{background:#1DAA54;transform:translateY(-1px)}
+.btn-pdf{background:#FA541C;color:#fff;box-shadow:0 2px 8px rgba(250,84,28,0.3)}
+.btn-pdf:hover{background:#D4380D;transform:translateY(-1px)}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+
+/* ── STATUS MSG ── */
+.status-msg{
+  border-radius:var(--r);padding:10px 14px;font-size:12px;
+  margin-top:10px;display:none;line-height:1.6;font-weight:500;
+}
+.status-ok{background:#F6FFED;border:1px solid #B7EB8F;color:#389E0D}
+.status-err{background:#FFF2F0;border:1px solid #FFCCC7;color:#CF1322}
+.status-loading{background:var(--biru-muda);border:1px solid var(--biru-terang);color:var(--biru)}
+
+/* ── UPLOAD ZONE ── */
+.upload-zone{
+  border:2px dashed var(--border);border-radius:var(--r-lg);
+  padding:1.5rem;text-align:center;cursor:pointer;
+  background:var(--abu);transition:all .15s;
+}
+.upload-zone:hover{background:var(--biru-muda);border-color:var(--biru3)}
 .upload-zone input{display:none}
-.upload-zone .icon{font-size:28px;margin-bottom:6px}
-.upload-zone p{font-size:12px;color:rgba(255,255,255,.5)}
-.upload-zone .hint{font-size:10px;color:rgba(255,255,255,.3);margin-top:4px}
+.upload-zone .icon{font-size:28px;margin-bottom:8px}
+.upload-zone p{font-size:13px;color:var(--teks2);font-weight:500}
+.upload-zone .hint{font-size:11px;color:var(--teks3);margin-top:4px}
 .photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
-.photo-thumb{position:relative;aspect-ratio:4/3;border-radius:7px;overflow:hidden;background:rgba(255,255,255,.05)}
+.photo-thumb{position:relative;aspect-ratio:4/3;border-radius:8px;overflow:hidden}
 .photo-thumb img{width:100%;height:100%;object-fit:cover}
 .photo-thumb .del{
-  position:absolute;top:4px;right:4px;width:20px;height:20px;
-  background:rgba(226,75,74,.9);border:none;border-radius:50%;
-  color:#fff;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center}
-.photo-thumb .lbl{
-  position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.6);
-  font-size:9px;color:#fff;padding:3px 6px;text-align:center}
-.photo-label-row{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
-.label-chip{
-  padding:4px 10px;border-radius:20px;font-size:10px;cursor:pointer;border:1px solid rgba(255,255,255,.15);
-  background:transparent;color:rgba(255,255,255,.5);transition:all .15s}
-.label-chip.active{background:#E6A817;color:#0F2540;border-color:#E6A817;font-weight:600}
-
-.btn-row{display:flex;gap:8px;margin-top:1rem;flex-wrap:wrap}
-.btn{flex:1;min-width:130px;padding:11px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:none;font-family:Arial,sans-serif;transition:all .15s}
-.btn-gold{background:#E6A817;color:#0F2540}
-.btn-gold:hover{background:#F5C842}
-.btn-navy{background:rgba(255,255,255,.09);color:#fff;border:1px solid rgba(255,255,255,.18)}
-.btn-navy:hover{background:rgba(255,255,255,.15)}
-.btn-green{background:#1D9E75;color:#fff}
-
-/* ══════════════════════════════════════════
-   PDF PAGE
-══════════════════════════════════════════ */
-.pdf-wrap{display:none;background:#fff}
-
-@media print{
-  .screen{display:none!important}
-  .pdf-wrap{display:block!important}
-  .no-print{display:none!important}
-  @page{margin:0;size:A4}
-}
-
-.pdf-page{
-  width:210mm;min-height:297mm;background:#fff;color:#000;
-  font-family:Arial,sans-serif;font-size:10pt;
-  position:relative;overflow:hidden;
-}
-
-/* PDF — Header */
-.ph{
-  background:#1A3A5C;padding:8mm 12mm 6mm;
-  display:flex;justify-content:space-between;align-items:center;
-}
-.ph-left{display:flex;align-items:center;gap:10px}
-.ph-logo{width:50px;height:50px;flex-shrink:0}
-.ph-logo svg{width:100%;height:100%}
-.ph-org{color:#fff}
-.ph-org-name{font-size:14pt;font-weight:700;letter-spacing:.5px;color:#fff}
-.ph-org-sub{font-size:7.5pt;color:rgba(255,255,255,.7);margin-top:1px}
-.ph-right{text-align:right;color:#fff}
-.ph-date-label{font-size:7.5pt;color:rgba(255,255,255,.6)}
-.ph-date{font-size:11pt;font-weight:700;color:#E6A817;margin-top:2px}
-
-/* Gold strip */
-.gold-strip{height:4px;background:linear-gradient(90deg,#E6A817,#F5C842,#E6A817)}
-
-/* PDF — Title */
-.pt{text-align:center;padding:5mm 12mm 4mm;border-bottom:1px solid #E6A817}
-.pt-main{font-size:16pt;font-weight:700;color:#1A3A5C;letter-spacing:1px}
-.pt-sub{font-size:9pt;font-weight:600;color:#E6A817;margin-top:2px}
-.pt-kpd{font-size:8pt;color:#666;margin-top:3px;font-style:italic}
-
-/* PDF — Foto grid */
-.pf{padding:4mm 12mm 3mm}
-.pf-label{
-  font-size:9pt;font-weight:700;color:#fff;
-  background:#1A3A5C;display:inline-block;
-  padding:3px 10px;border-radius:20px;margin-bottom:4mm;
-}
-.pf-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3mm}
-.pf-img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:4px;display:block}
-.pf-img-placeholder{
-  width:100%;aspect-ratio:4/3;background:#f0f0f0;border-radius:4px;
+  position:absolute;top:4px;right:4px;width:22px;height:22px;
+  background:rgba(207,19,34,0.85);border:none;border-radius:50%;
+  color:#fff;font-size:13px;cursor:pointer;
   display:flex;align-items:center;justify-content:center;
-  font-size:8pt;color:#aaa;border:1px dashed #ddd;
 }
-.pf-cat{text-align:center;font-size:7.5pt;font-weight:600;color:#E6A817;margin-top:2mm;text-transform:uppercase;letter-spacing:.05em}
-
-/* PDF — Summary bar (yellow) */
-.ps{background:#E6A817;padding:5mm 12mm}
-.ps-title{font-size:11pt;font-weight:700;color:#1A3A5C;text-align:center;margin-bottom:3mm}
-.ps-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:4mm}
-.ps-card{background:rgba(255,255,255,.5);border-radius:6px;padding:5px 8px;text-align:center}
-.ps-n{font-size:16pt;font-weight:700;color:#1A3A5C}
-.ps-l{font-size:7pt;color:#1A3A5C;text-transform:uppercase;letter-spacing:.04em;font-weight:600}
-
-/* PDF — Data table */
-.pd{padding:3mm 12mm}
-.pd-section{
-  font-size:8pt;font-weight:700;color:#fff;
-  background:#1A3A5C;padding:3px 8px;
-  border-radius:3px 3px 0 0;display:inline-block;margin-bottom:0;margin-top:3mm;
+.photo-thumb .lbl{
+  position:absolute;bottom:0;left:0;right:0;
+  background:rgba(0,53,128,0.75);font-size:9px;color:#fff;
+  padding:3px 6px;text-align:center;font-weight:600;letter-spacing:.3px;
 }
-.pd-section.dep{background:#245080}
-table.ptbl{width:100%;border-collapse:collapse;font-size:7.5pt;margin-bottom:2mm}
-table.ptbl th{background:#1A3A5C;color:#fff;padding:4px 5px;text-align:center;font-weight:600;font-size:7pt}
-table.ptbl td{padding:4px 5px;border:0.5px solid #e0e0e0;text-align:center;color:#222}
-table.ptbl tr:nth-child(even) td{background:#F8F9FB}
-.td-bold{font-weight:700}
-.td-delay{background:#FFF8E1!important;color:#854F0B!important;font-weight:600}
 
-/* PDF — Catatan & TTD */
-.pc{padding:2mm 12mm}
-.pc-title{font-size:8pt;font-weight:700;color:#1A3A5C;margin-bottom:2px}
-.pc-text{font-size:8pt;color:#333;font-style:italic;line-height:1.6}
-.pttd{display:flex;justify-content:flex-end;padding:3mm 12mm 6mm}
-.pttd-box{text-align:center;width:150px}
-.pttd-label{font-size:8.5pt;font-weight:600;color:#1A3A5C}
-.pttd-sub{font-size:7.5pt;color:#666;margin-top:2px;line-height:1.4}
-.pttd-space{height:50px}
-.pttd-name{font-size:8.5pt;font-weight:700;text-decoration:underline;color:#1A3A5C}
-.pttd-nip{font-size:7pt;color:#666;margin-top:2px}
-
-/* PDF — Footer */
-.pfoot{
-  background:#1A3A5C;padding:4px 12mm;
-  display:flex;justify-content:space-between;align-items:center;
+/* ── PREVIEW BOX ── */
+.preview-box{
+  background:var(--abu);border:1px solid var(--border);border-radius:var(--r);
+  padding:1rem;font-family:'Courier New',monospace;font-size:11px;
+  color:var(--teks2);line-height:1.8;white-space:pre-wrap;
+  max-height:360px;overflow-y:auto;
 }
-.pfoot-name{font-size:9pt;font-weight:700;color:#E6A817;letter-spacing:1px}
-.pfoot-info{font-size:7pt;color:rgba(255,255,255,.65);text-align:center}
-.pfoot-addr{font-size:7pt;color:rgba(255,255,255,.65);text-align:right}
 
+/* ── WA BOX ── */
+.wa-box{
+  background:#ECE5DD;border-radius:var(--r-lg);padding:1rem;
+  font-size:12px;color:#111;line-height:1.8;white-space:pre-wrap;
+  max-height:360px;overflow-y:auto;border:1px solid #CEC8BF;
+}
+.wa-bubble{
+  background:#fff;border-radius:0 10px 10px 10px;padding:10px 14px;
+  box-shadow:0 1px 2px rgba(0,0,0,0.1);display:inline-block;
+  max-width:90%;
+}
+
+/* ── SETUP STEPS ── */
+.step{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--abu2)}
+.step:last-child{border-bottom:none}
+.step-num{
+  width:28px;height:28px;border-radius:50%;background:var(--biru);
+  color:#fff;font-size:12px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;
+}
+.step-num.done{background:#52C41A}
+.step-title{font-size:13px;font-weight:600;color:var(--teks);margin-bottom:3px}
+.step-desc{font-size:12px;color:var(--teks2);line-height:1.6}
+code{background:var(--biru-muda);color:var(--biru);padding:1px 6px;border-radius:4px;font-size:11px}
+
+/* ── INFO BANNER ── */
+.info-banner{
+  background:var(--biru-muda);border:1px solid var(--biru-terang);
+  border-radius:var(--r);padding:10px 14px;font-size:12px;
+  color:var(--biru);line-height:1.6;margin-bottom:1rem;
+  display:flex;gap:8px;align-items:flex-start;
+}
+
+/* ── MODAL ── */
+.modal-overlay{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);
+  z-index:200;align-items:center;justify-content:center;padding:1rem;
+}
+.modal-overlay.open{display:flex}
+.modal{
+  background:var(--putih);border-radius:var(--r-lg);padding:1.5rem;
+  width:100%;max-width:480px;box-shadow:var(--shadow-md);
+}
+.modal-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--biru);margin-bottom:.5rem}
+.modal-sub{font-size:12px;color:var(--teks3);margin-bottom:1.25rem;line-height:1.6}
+.modal-footer{display:flex;gap:8px;margin-top:1rem}
+
+/* ── RESPONSIVE ── */
 @media(max-width:600px){
   .g2,.g3,.g4,.stats{grid-template-columns:1fr 1fr}
+  .g3{grid-template-columns:1fr 1fr 1fr}
   .full{grid-column:1/-1}
   .btn-row{flex-direction:column}
+  .btn{min-width:unset}
+  .header-strip{padding:1rem}
+  .header-text .title{font-size:15px}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .photo-grid{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:380px){
+  .g2{grid-template-columns:1fr}
+  .g3{grid-template-columns:1fr 1fr}
 }
 </style>
 </head>
 <body>
 
-<!-- CONFIG MODAL -->
-<div id="cfg-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;align-items:center;justify-content:center;padding:1rem">
-  <div style="background:#1A3A5C;border:1px solid rgba(255,255,255,.15);border-radius:14px;padding:1.5rem;width:100%;max-width:460px">
-    <div style="font-size:16px;font-weight:600;margin-bottom:.4rem">Konfigurasi Sistem</div>
-    <div style="font-size:12px;color:rgba(255,255,255,.5);margin-bottom:1.1rem">Hubungkan PDF generator ke Google Sheets & WhatsApp otomatis</div>
-    <div style="display:flex;flex-direction:column;gap:4px;margin-bottom:10px">
-      <label style="font-size:11px;color:rgba(255,255,255,.45)">Web App URL (Google Apps Script)</label>
-      <input id="cfg-url" type="text" placeholder="https://script.google.com/macros/s/..." style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);border-radius:7px;padding:8px 11px;font-size:12px;color:#fff;width:100%"/>
+<!-- MODAL KONFIGURASI -->
+<div class="modal-overlay" id="cfg-modal">
+  <div class="modal">
+    <div class="modal-title">Konfigurasi Sistem</div>
+    <div class="modal-sub">Hubungkan ke Google Sheets & WhatsApp untuk mengaktifkan fitur otomatis</div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div class="fld">
+        <label>Web App URL (Google Apps Script)</label>
+        <input type="text" id="cfg-url" placeholder="https://script.google.com/macros/s/..."/>
+      </div>
+      <div class="fld">
+        <label>Nomor WhatsApp Kepala Kantor</label>
+        <input type="text" id="cfg-wa" placeholder="628xxxxxxxxx"/>
+      </div>
+      <div class="fld">
+        <label>Token Fonnte (untuk kirim gambar WA)</label>
+        <input type="text" id="cfg-token" placeholder="token dari fonnte.com"/>
+      </div>
     </div>
-    <div style="display:flex;flex-direction:column;gap:4px;margin-bottom:10px">
-      <label style="font-size:11px;color:rgba(255,255,255,.45)">Nomor WhatsApp Kepala Kantor (628xxx)</label>
-      <input id="cfg-wa" type="text" placeholder="628xxxxxxxxx" style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);border-radius:7px;padding:8px 11px;font-size:12px;color:#fff;width:100%"/>
+    <div class="modal-footer">
+      <button class="btn btn-primary" style="flex:1" onclick="saveConfig()">Simpan & Hubungkan</button>
+      <button class="btn btn-secondary" style="flex:0;padding:11px 16px" onclick="closeModal()">Nanti</button>
     </div>
-    <div style="display:flex;flex-direction:column;gap:4px;margin-bottom:1.1rem">
-      <label style="font-size:11px;color:rgba(255,255,255,.45)">Token Fonnte (untuk kirim gambar WA)</label>
-      <input id="cfg-token" type="text" placeholder="token dari fonnte.com" style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);border-radius:7px;padding:8px 11px;font-size:12px;color:#fff;width:100%"/>
-      <div style="font-size:10px;color:rgba(255,255,255,.3);margin-top:2px">Token ini untuk kirim screenshot laporan sebagai gambar WA otomatis</div>
+    <div id="cfg-status" class="status-msg"></div>
+  </div>
+</div>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="topbar-left">
+    <div class="logo-kemenhub">
+      <svg viewBox="0 0 28 28" fill="none">
+        <circle cx="14" cy="14" r="13" fill="#003580"/>
+        <path d="M7 20L14 8L21 20" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <path d="M10 20L14 13L18 20" fill="#D0021B"/>
+        <rect x="11" y="20" width="6" height="3" rx="1" fill="#D0021B"/>
+      </svg>
     </div>
-    <div style="display:flex;gap:8px">
-      <button onclick="saveConfig()" style="flex:1;padding:10px;background:#E6A817;color:#0F2540;border:none;border-radius:7px;font-weight:600;cursor:pointer;font-size:13px">Simpan</button>
-      <button onclick="el('cfg-modal').style.display='none'" style="padding:10px 16px;background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:7px;cursor:pointer;font-size:13px">Nanti</button>
+    <div class="topbar-title">
+      <div class="main">Post-Flight Intelligence</div>
+      <div class="sub">UPBU Kelas III H. Aroeppala Selayar — Kemenhub RI</div>
+    </div>
+  </div>
+  <div class="conn-badge" onclick="openModal()">
+    <div class="conn-dot" id="conn-dot"></div>
+    <span id="conn-label">Konfigurasi</span>
+  </div>
+</header>
+
+<!-- HEADER STRIP -->
+<div class="header-strip">
+  <div class="header-icon">✈</div>
+  <div class="header-text">
+    <div class="title">Sistem Pelaporan Operasional Bandar Udara</div>
+    <div class="sub">UNIT LLAU — KANTOR UPBU KELAS III H. AROEPPALA SELAYAR</div>
+    <div class="header-badges">
+      <span class="hbadge red">Ditjen Perhubungan Udara</span>
+      <span class="hbadge">Kementerian Perhubungan RI</span>
+      <span class="hbadge">Unit LLAU</span>
     </div>
   </div>
 </div>
 
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('input')"><span class="tab-icon">📋</span>Input Data</button>
+  <button class="tab" onclick="switchTab('laporan')"><span class="tab-icon">📄</span>Laporan</button>
+  <button class="tab" onclick="switchTab('wa')"><span class="tab-icon">💬</span>WhatsApp</button>
+  <button class="tab" onclick="switchTab('setup')"><span class="tab-icon">⚙</span>Setup</button>
+</div>
 
-<!-- ═══ SCREEN UI ═══ -->
-<div class="screen">
-  <div class="top-bar">
-    <div class="top-icon">PDF</div>
-    <div>
-      <div class="top-title">Generator Laporan PDF</div>
-      <div class="top-sub">UPBU Kelas III H. Aroeppala Selayar — Unit LLAU</div>
+<!-- MAIN CONTENT -->
+<div class="main">
 
-    <div style="margin-left:auto;display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:6px 12px;cursor:pointer;font-size:11px;color:rgba(255,255,255,.6)" onclick="el('cfg-modal').style.display='flex'">
-      <div id="cfg-dot" style="width:7px;height:7px;border-radius:50%;background:#F59E0B"></div>
-      <span id="cfg-label">Konfigurasi</span>
+<!-- ═══ TAB INPUT ═══ -->
+<div id="tab-input" class="panel active">
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon">🛩</div>
+      <div>
+        <div class="card-title">Informasi Penerbangan</div>
+        <div class="card-sub">Data identitas & jadwal penerbangan harian</div>
+      </div>
     </div>
-
-    </div>
-  </div>
-
-  <!-- Info Penerbangan -->
-  <div class="scard">
-    <div class="scard-title">Informasi penerbangan</div>
     <div class="g2">
       <div class="fld"><label>Tanggal</label><input type="date" id="tgl" oninput="onTgl()"/></div>
       <div class="fld"><label>Hari</label><input type="text" id="hari" readonly/></div>
       <div class="fld"><label>Maskapai</label><input type="text" id="maskapai" value="Fly Jaya"/></div>
       <div class="fld"><label>Operator</label><input type="text" id="operator" value="PT. Surya Mataram Nusantara"/></div>
       <div class="fld"><label>Registrasi</label><input type="text" id="reg" value="PK-FJA"/></div>
-      <div class="fld"><label>Tipe pesawat</label><input type="text" id="tipe" value="ATR 72-500"/></div>
+      <div class="fld"><label>Tipe Pesawat</label><input type="text" id="tipe" value="ATR 72-500"/></div>
       <div class="fld full"><label>Rute</label><input type="text" id="rute" value="UPG-KSR-UPG"/></div>
     </div>
   </div>
 
-  <!-- Arrival & Departure -->
-  <div class="g2" style="gap:9px">
-    <div class="scard">
-      <div class="scard-title">🛬 Arrival</div>
-      <div style="display:flex;flex-direction:column;gap:7px">
+  <div class="g2" style="gap:10px">
+    <div class="flight-card arr">
+      <div class="flight-label arr">🛬 Arrival <span class="flt-badge arr">ARR</span></div>
+      <div style="display:flex;flex-direction:column;gap:8px">
         <div class="g2">
-          <div class="fld"><label>Flt ARR</label><input type="text" id="flt_arr" value="KS503"/></div>
-          <div class="fld"><label>Route</label><input type="text" id="route_arr" value="UPG"/></div>
+          <div class="fld"><label>No Flight</label><input type="text" id="flt_arr" value="KS503"/></div>
+          <div class="fld"><label>Route ARR</label><input type="text" id="route_arr" value="UPG"/></div>
         </div>
         <div class="g2">
-          <div class="fld"><label>STA</label><input type="time" id="sta" value="14:10" oninput="calc()"/></div>
-          <div class="fld"><label>ATA</label><input type="time" id="ata" value="14:26" oninput="calc()"/></div>
+          <div class="fld"><label>STA (LT)</label><input type="time" id="sta" value="14:10" oninput="calcDelay()"/></div>
+          <div class="fld"><label>ATA (LT)</label><input type="time" id="ata" value="14:26" oninput="calcDelay()"/></div>
         </div>
+        <div id="delay-arr" class="delay-info">⚠ Delay ARR: 0 menit</div>
+        <div class="section-label">Penumpang Tiba</div>
         <div class="g3">
           <div class="fld"><label>Dewasa</label><input type="number" id="pd" value="44" min="0" oninput="calc()"/></div>
           <div class="fld"><label>Anak</label><input type="number" id="pa" value="5" min="0" oninput="calc()"/></div>
@@ -267,17 +443,20 @@ table.ptbl tr:nth-child(even) td{background:#F8F9FB}
         </div>
       </div>
     </div>
-    <div class="scard">
-      <div class="scard-title">🛫 Departure</div>
-      <div style="display:flex;flex-direction:column;gap:7px">
+
+    <div class="flight-card dep">
+      <div class="flight-label dep">🛫 Departure <span class="flt-badge dep">DEP</span></div>
+      <div style="display:flex;flex-direction:column;gap:8px">
         <div class="g2">
-          <div class="fld"><label>Flt DEP</label><input type="text" id="flt_dep" value="KS504"/></div>
-          <div class="fld"><label>Route</label><input type="text" id="route_dep" value="KSR"/></div>
+          <div class="fld"><label>No Flight</label><input type="text" id="flt_dep" value="KS504"/></div>
+          <div class="fld"><label>Route DEP</label><input type="text" id="route_dep" value="KSR"/></div>
         </div>
         <div class="g2">
-          <div class="fld"><label>STD</label><input type="time" id="std" value="15:07" oninput="calc()"/></div>
-          <div class="fld"><label>ATD</label><input type="time" id="atd" value="15:11" oninput="calc()"/></div>
+          <div class="fld"><label>STD (LT)</label><input type="time" id="std" value="15:07" oninput="calcDelay()"/></div>
+          <div class="fld"><label>ATD (LT)</label><input type="time" id="atd" value="15:11" oninput="calcDelay()"/></div>
         </div>
+        <div id="delay-dep" class="delay-info">⚠ Delay DEP: 0 menit</div>
+        <div class="section-label">Penumpang Berangkat</div>
         <div class="g3">
           <div class="fld"><label>Dewasa</label><input type="number" id="dd" value="61" min="0" oninput="calc()"/></div>
           <div class="fld"><label>Anak</label><input type="number" id="da" value="4" min="0" oninput="calc()"/></div>
@@ -291,182 +470,171 @@ table.ptbl tr:nth-child(even) td{background:#F8F9FB}
     </div>
   </div>
 
-  <!-- Stats -->
   <div class="stats">
-    <div class="stat"><div class="n" id="s1">51</div><div class="l">Pax tiba</div></div>
-    <div class="stat"><div class="n" id="s2">68</div><div class="l">Pax berangkat</div></div>
+    <div class="stat"><div class="n" id="s1">51</div><div class="l">Pax Tiba</div></div>
+    <div class="stat"><div class="n" id="s2">68</div><div class="l">Pax Berangkat</div></div>
     <div class="stat"><div class="n" id="s3">556</div><div class="l">Bagasi (kg)</div></div>
-    <div class="stat"><div class="n" id="s4">119</div><div class="l">Grand total pax</div></div>
+    <div class="stat"><div class="n" id="s4">119</div><div class="l">Grand Total Pax</div></div>
   </div>
 
-  <!-- Upload Foto -->
-  <div class="scard">
-    <div class="scard-title">📸 Dokumentasi foto</div>
-    <div class="upload-zone" onclick="document.getElementById('fotoInput').click()">
-      <input type="file" id="fotoInput" accept="image/*" multiple onchange="handlePhotos(event)"/>
-      <div class="icon">📷</div>
-      <p>Klik untuk upload foto penerbangan</p>
-      <div class="hint">Bisa pilih beberapa foto sekaligus (JPG, PNG) — max 6 foto</div>
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon">📝</div>
+      <div>
+        <div class="card-title">Keterangan & Petugas</div>
+        <div class="card-sub">Status penerbangan dan informasi petugas jaga</div>
+      </div>
     </div>
-    <div id="photo-grid" class="photo-grid" style="display:none"></div>
-  </div>
-
-  <!-- Keterangan -->
-  <div class="scard">
-    <div class="scard-title">Keterangan & TTD</div>
     <div class="g2">
       <div class="fld">
-        <label>Remark</label>
-        <select id="remark"><option>Regular Flight</option><option>Extra Flight</option><option>Charter Flight</option><option>Delay</option></select>
+        <label>Remark / Status</label>
+        <select id="remark">
+          <option>Regular Flight</option>
+          <option>Extra Flight</option>
+          <option>Charter Flight</option>
+          <option>Delay</option>
+          <option>Cancelled</option>
+        </select>
       </div>
-      <div class="fld"><label>Petugas jaga</label><input type="text" id="petugas" placeholder="Nama petugas LLAU"/></div>
-      <div class="fld"><label>Nama Kepala Kantor</label><input type="text" id="kakan" value="Hery Sugianto, S.T."/></div>
-      <div class="fld"><label>NIP</label><input type="text" id="nip" placeholder="NIP Kepala Kantor"/></div>
-      <div class="fld full"><label>Catatan</label><textarea id="catatan">seluruh aktivitas pelayanan penerbangan telah berjalan dengan lancar dan dilaksanakan sesuai dengan standar operasional yang berlaku.</textarea></div>
+      <div class="fld"><label>Petugas Jaga LLAU</label><input type="text" id="petugas" placeholder="Nama petugas"/></div>
+      <div class="fld full">
+        <label>Catatan</label>
+        <textarea id="catatan">seluruh aktivitas pelayanan penerbangan telah berjalan dengan lancar dan dilaksanakan sesuai dengan standar operasional yang berlaku.</textarea>
+      </div>
     </div>
   </div>
 
   <div class="btn-row">
-    <button class="btn btn-gold" onclick="previewPDF()">👁 Preview PDF</button>
-    <button class="btn btn-navy" onclick="generateAndPrint()">🖨 Cetak / Save PDF</button>
+    <button class="btn btn-primary" onclick="submitData()">💾 Simpan ke Sheets</button>
+    <button class="btn btn-pdf" onclick="goLaporan()">📄 Generate PDF</button>
+    <button class="btn btn-wa" onclick="goWA()">💬 Preview WA</button>
+  </div>
+  <div id="submit-status" class="status-msg"></div>
+</div>
+
+<!-- ═══ TAB LAPORAN ═══ -->
+<div id="tab-laporan" class="panel">
+  <div class="info-banner">
+    ℹ Klik "Generate Preview" → cek laporan → klik "Cetak / Save PDF" untuk simpan file. PDF tidak dikirim otomatis — kirim manual via WhatsApp setelah disimpan.
+  </div>
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon">📄</div>
+      <div>
+        <div class="card-title">Preview Laporan Penerbangan Harian</div>
+        <div class="card-sub">Format resmi UPBU H. Aroeppala Selayar</div>
+      </div>
+    </div>
+    <div class="preview-box" id="preview-text">Isi data di tab Input Data lalu klik Generate PDF.</div>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-primary" onclick="generatePreview()">🔄 Generate Preview</button>
+    <button class="btn btn-pdf" onclick="cetakPDF()">🖨 Cetak / Save PDF</button>
+    <button class="btn btn-secondary" onclick="copyPreview()">📋 Salin Teks</button>
   </div>
 </div>
 
-<!-- ═══ PDF PAGE ═══ -->
-<div class="pdf-wrap" id="pdf-wrap">
-
-  <!-- Preview controls (hidden on print) -->
-  <div class="no-print" style="background:#0F2540;padding:12px 1.5rem;display:flex;gap:10px;align-items:center;position:sticky;top:0;z-index:100">
-    <button onclick="generateAndPrint()" style="padding:9px 18px;background:#E6A817;color:#0F2540;border:none;border-radius:7px;font-weight:600;cursor:pointer;font-size:13px">🖨 Cetak / Save PDF</button>
-    <button onclick="backToForm()" style="padding:9px 18px;background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:7px;cursor:pointer;font-size:13px">← Kembali Edit</button>
-    <span style="font-size:11px;color:rgba(255,255,255,.5);margin-left:8px">Tip: Saat cetak → pilih "Save as PDF" → Paper size A4</span>
+<!-- ═══ TAB WA ═══ -->
+<div id="tab-wa" class="panel">
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon">📱</div>
+      <div>
+        <div class="card-title">Nomor Tujuan WhatsApp</div>
+        <div class="card-sub">Laporan teks dikirim otomatis saat simpan data</div>
+      </div>
+    </div>
+    <div class="g2">
+      <div class="fld"><label>Kepala Kantor (Bpk. Hery Sugianto)</label><input type="text" id="wa-kakan" placeholder="628xxxxxxxxx"/></div>
+      <div class="fld"><label>Nomor Lain (opsional)</label><input type="text" id="wa-other" placeholder="628xxxxxxxxx"/></div>
+    </div>
   </div>
-
-  <div class="pdf-page" id="pdf-page">
-
-    <!-- Header navy -->
-    <div class="ph">
-      <div class="ph-left">
-        <svg class="ph-logo" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="30" cy="30" r="28" stroke="#E6A817" stroke-width="2.5"/>
-          <path d="M12 36 L30 14 L48 36" stroke="#E6A817" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-          <path d="M20 36 L30 22 L40 36" fill="#E6A817"/>
-          <rect x="24" y="36" width="12" height="7" rx="1.5" fill="#E6A817"/>
-        </svg>
-        <div class="ph-org">
-          <div class="ph-org-name">Kantor UPBU H. Aroeppala Selayar</div>
-          <div class="ph-org-sub">Direktorat Jenderal Perhubungan Udara — Kementerian Perhubungan RI</div>
-        </div>
-      </div>
-      <div class="ph-right">
-        <div class="ph-date-label">Tanggal:</div>
-        <div class="ph-date" id="p-tgl">—</div>
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon">💬</div>
+      <div>
+        <div class="card-title">Preview Pesan WhatsApp</div>
+        <div class="card-sub">Format teks yang dikirim otomatis ke pimpinan</div>
       </div>
     </div>
-    <div class="gold-strip"></div>
-
-    <!-- Title -->
-    <div class="pt">
-      <div class="pt-main">Laporan Penerbangan Harian</div>
-      <div class="pt-sub">Kantor UPBU H. Aroeppala Selayar</div>
-      <div class="pt-kpd">Kepada Yth. Dirjen Perhubungan Udara &nbsp;•&nbsp; Sesditjen Perhubungan Udara &nbsp;•&nbsp; Direktur Bandar Udara &nbsp;•&nbsp; Kepala OBU Wil. V Makassar</div>
-    </div>
-
-    <!-- FOTO SECTION -->
-    <div class="pf" id="p-foto-section">
-      <div class="pf-label">Dokumentasi Penerbangan</div>
-      <div class="pf-grid" id="p-foto-grid"></div>
-    </div>
-
-    <!-- Summary Bar (gold) -->
-    <div class="ps">
-      <div class="ps-title" id="p-movement-title">Movement Report</div>
-      <div class="ps-grid">
-        <div class="ps-card">
-          <div class="ps-n">1 / 1</div>
-          <div class="ps-l">Datang / Berangkat</div>
-        </div>
-        <div class="ps-card">
-          <div class="ps-n" id="p-pax-arr-s">—</div>
-          <div class="ps-l">Penumpang Datang</div>
-        </div>
-        <div class="ps-card">
-          <div class="ps-n" id="p-pax-dep-s">—</div>
-          <div class="ps-l">Penumpang Berangkat</div>
-        </div>
-        <div class="ps-card">
-          <div class="ps-n" id="p-bgs-s">—</div>
-          <div class="ps-l">Total Bagasi (kg)</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Tables -->
-    <div class="pd">
-      <div class="pd-section">ARRIVAL</div>
-      <table class="ptbl">
-        <thead>
-          <tr>
-            <th>No</th><th>Tanggal</th><th>Route ARR</th><th>AOC</th><th>Reg</th><th>Type AC</th>
-            <th>Flt No</th><th>STA (LT)</th><th>ATA (LT)</th>
-            <th>D</th><th>A</th><th>B</th><th>Total</th>
-            <th>Bagasi (kg)</th><th>Kargo (kg)</th><th>ARR</th><th>Remark</th>
-          </tr>
-        </thead>
-        <tbody id="p-arr-body"></tbody>
-      </table>
-
-      <div class="pd-section dep">DEPARTURE</div>
-      <table class="ptbl">
-        <thead>
-          <tr>
-            <th>No</th><th>Tanggal</th><th>Route DEP</th><th>AOC</th><th>Reg</th><th>Type AC</th>
-            <th>Flt No</th><th>STD (LT)</th><th>ATD (LT)</th>
-            <th>D</th><th>A</th><th>B</th><th>Total</th>
-            <th>Bagasi (kg)</th><th>Kargo (kg)</th><th>DEP</th><th>Remark</th>
-          </tr>
-        </thead>
-        <tbody id="p-dep-body"></tbody>
-      </table>
-    </div>
-
-    <!-- Catatan -->
-    <div class="pc">
-      <div class="pc-title">Catatan :</div>
-      <div class="pc-text" id="p-catatan">—</div>
-    </div>
-
-    <!-- TTD -->
-    <div class="pttd">
-      <div class="pttd-box">
-        <div class="pttd-label">Hormat kami,</div>
-        <div class="pttd-sub">Kepala Kantor<br>UPBU H. Aroeppala Selayar</div>
-        <div class="pttd-space"></div>
-        <div class="pttd-name" id="p-kakan">Hery Sugianto, S.T.</div>
-        <div class="pttd-nip" id="p-nip"></div>
-      </div>
-    </div>
-
-    <!-- Footer -->
-    <div class="pfoot">
-      <div class="pfoot-name">BANDAR UDARA H. AROEPPALA</div>
-      <div class="pfoot-info">☎ 0852-2034-8115 &nbsp; ✉ aroeppalaairport@gmail.com</div>
-      <div class="pfoot-addr">Jl. Poros Padang, Kab. Kepulauan Selayar<br>Sulawesi Selatan</div>
-    </div>
-
+    <div class="wa-box"><div class="wa-bubble" id="wa-text">Generate dari tab Input Data terlebih dahulu.</div></div>
   </div>
+  <div class="btn-row">
+    <button class="btn btn-wa" onclick="kirimWA(1)">📤 Kirim ke Kepala Kantor</button>
+    <button class="btn btn-wa" onclick="kirimWA(2)">📤 Kirim ke Nomor Lain</button>
+    <button class="btn btn-secondary" onclick="copyWA()">📋 Salin Pesan</button>
+  </div>
+</div>
+
+<!-- ═══ TAB SETUP ═══ -->
+<div id="tab-setup" class="panel">
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon">✅</div>
+      <div>
+        <div class="card-title">Status Sistem</div>
+        <div class="card-sub">Post-Flight Intelligence System v2.0</div>
+      </div>
+    </div>
+    <div class="step"><div class="step-num done">✓</div><div><div class="step-title">Google Sheets Database</div><div class="step-desc">Template xlsx aktif — sheet Data Harian, Rekap Bulanan, Log Aktivitas.</div></div></div>
+    <div class="step"><div class="step-num done">✓</div><div><div class="step-title">Google Apps Script Web App</div><div class="step-desc">Deployed & aktif. Data dari form → Sheets → WA otomatis.</div></div></div>
+    <div class="step"><div class="step-num" id="step3-num">3</div><div><div class="step-title">Web App URL — <span id="step3-status" style="color:#FA8C16">belum dikonfigurasi</span></div><div class="step-desc">Klik <code>Konfigurasi</code> di pojok kanan atas untuk isi URL Web App.</div><button class="btn btn-primary" style="margin-top:8px;flex:0;padding:8px 14px;font-size:12px" onclick="openModal()">Isi Konfigurasi</button></div></div>
+    <div class="step"><div class="step-num done">✓</div><div><div class="step-title">GitHub Pages — Live</div><div class="step-desc">Aplikasi tersedia di <code>aroeppalaoffice.github.io/llau-selayar</code></div></div></div>
+    <div class="step" style="border-bottom:none"><div class="step-num done">✓</div><div><div class="step-title">WhatsApp Fonnte Gateway</div><div class="step-desc">Terhubung & aktif. WA terkirim otomatis ke Kepala Kantor setiap input data.</div></div></div>
+  </div>
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon">ℹ</div>
+      <div><div class="card-title">Informasi Aplikasi</div></div>
+    </div>
+    <div style="font-size:12px;color:var(--teks2);line-height:2">
+      <b>Versi</b> : Post-Flight Intelligence System v2.0<br>
+      <b>Unit</b> : LLAU — UPBU Kelas III H. Aroeppala Selayar<br>
+      <b>Dibuat</b> : Dalam rangka Aktualisasi Latsar CPNS Gelombang I Angkatan I 2026<br>
+      <b>Kontak</b> : aroeppalaairport@gmail.com | 0852-2034-8115
+    </div>
+  </div>
+</div>
+
+</div><!-- /main -->
+
+<!-- PDF PRINT PAGE -->
+<div id="pdf-print" style="display:none">
+  <style>
+    @media print{
+      body > *:not(#pdf-print){ display:none!important }
+      #pdf-print{ display:block!important }
+      @page{ margin:15mm; size:A4 }
+    }
+    #pdf-print{ font-family:Arial,sans-serif; }
+    .pdf-header{ background:#003580; color:#fff; padding:12mm 15mm 8mm; display:flex; justify-content:space-between; align-items:center; }
+    .pdf-gold-bar{ height:4px; background:linear-gradient(90deg,#003580,#D0021B); }
+    .pdf-title{ text-align:center; padding:8mm 15mm 6mm; border-bottom:2px solid #003580; }
+    .pdf-title h1{ font-size:18pt; font-weight:700; color:#003580; }
+    .pdf-title p{ font-size:9pt; color:#666; margin-top:3px; }
+    .pdf-body{ padding:6mm 15mm; }
+    .pdf-section{ font-size:8pt; font-weight:700; color:#fff; background:#003580; padding:3px 8px; border-radius:3px; margin-top:5mm; display:inline-block; }
+    .pdf-section.dep{ background:#1677FF; }
+    table.pdf-tbl{ width:100%; border-collapse:collapse; font-size:7.5pt; margin-top:1mm; }
+    table.pdf-tbl th{ background:#003580; color:#fff; padding:4px 6px; text-align:center; font-size:7pt; }
+    table.pdf-tbl td{ padding:4px 6px; border:0.5px solid #ddd; text-align:center; }
+    table.pdf-tbl tr:nth-child(even) td{ background:#F4F6FA; }
+    .pdf-summary{ background:#003580; color:#fff; padding:5mm 15mm; display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+    .pdf-sum-card{ background:rgba(255,255,255,0.15); border-radius:6px; padding:6px; text-align:center; }
+    .pdf-sum-n{ font-size:18pt; font-weight:700; }
+    .pdf-sum-l{ font-size:7pt; opacity:.8; margin-top:2px; }
+    .pdf-catatan{ padding:4mm 15mm; border-top:1px solid #eee; }
+    .pdf-ttd{ display:flex; justify-content:flex-end; padding:4mm 15mm 8mm; }
+    .pdf-ttd-box{ text-align:center; width:160px; }
+    .pdf-footer{ background:#003580; color:rgba(255,255,255,0.7); padding:4px 15mm; display:flex; justify-content:space-between; font-size:7pt; }
+  </style>
+  <div id="pdf-content"></div>
 </div>
 
 <script>
 const HARI_N  = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
-const BULAN_N = ['Januari','Februari','Maret','April','Mei','Juni',
-                 'Juli','Agustus','September','Oktober','November','Desember'];
-
+const BULAN_N = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
 let photos = [];
-
-const v  = id => document.getElementById(id)?.value || '';
-const n  = id => parseInt(document.getElementById(id)?.value) || 0;
-const el = id => document.getElementById(id);
 
 const CFG = {
   webAppUrl : localStorage.getItem('pfi_url')   || '',
@@ -474,10 +642,14 @@ const CFG = {
   waToken   : localStorage.getItem('pfi_token') || '',
 };
 
+const v  = id => document.getElementById(id)?.value || '';
+const n  = id => parseInt(document.getElementById(id)?.value) || 0;
+const el = id => document.getElementById(id);
+
 function formatTgl(d) {
   if (!d) return '';
   const dt = new Date(d + 'T00:00:00');
-  return HARI_N[dt.getDay()] + ', ' + dt.getDate() + ' ' + BULAN_N[dt.getMonth()] + ' ' + dt.getFullYear();
+  return `${HARI_N[dt.getDay()]}, ${dt.getDate()} ${BULAN_N[dt.getMonth()]} ${dt.getFullYear()}`;
 }
 
 function onTgl() {
@@ -488,470 +660,283 @@ function onTgl() {
 }
 
 function calc() {
-  const a = n('pd') + n('pa') + n('pb');
-  const d = n('dd') + n('da') + n('db');
+  const a = n('pd')+n('pa')+n('pb');
+  const d = n('dd')+n('da')+n('db');
   el('s1').textContent = a;
   el('s2').textContent = d;
-  el('s3').textContent = n('bgs_a') + n('bgs_d');
-  el('s4').textContent = a + d;
+  el('s3').textContent = n('bgs_a')+n('bgs_d');
+  el('s4').textContent = a+d;
 }
 
-function delay(s, a) {
-  if (!s || !a) return 0;
-  const [sh, sm] = s.split(':').map(Number);
-  const [ah, am] = a.split(':').map(Number);
-  return Math.max(0, (ah * 60 + am) - (sh * 60 + sm));
+function delay(s,a) {
+  if (!s||!a) return 0;
+  const [sh,sm]=s.split(':').map(Number), [ah,am]=a.split(':').map(Number);
+  return Math.max(0,(ah*60+am)-(sh*60+sm));
 }
 
-function handlePhotos(e) {
-  const files = Array.from(e.target.files).slice(0, 6 - photos.length);
-  files.forEach(file => {
-    const reader = new FileReader();
-    reader.onload = ev => {
-      photos.push({ dataUrl: ev.target.result, label: guessLabel(photos.length) });
-      renderPhotoGrid();
-    };
-    reader.readAsDataURL(file);
+function calcDelay() {
+  calc();
+  const dA=delay(v('sta'),v('ata')), dD=delay(v('std'),v('atd'));
+  const eA=el('delay-arr'), eD=el('delay-dep');
+  if (dA>0){ eA.style.display='block'; eA.textContent=`⚠ Delay ARR: ${dA} menit`; }
+  else eA.style.display='none';
+  if (dD>0){ eD.style.display='block'; eD.textContent=`⚠ Delay DEP: ${dD} menit`; }
+  else eD.style.display='none';
+}
+
+function switchTab(t) {
+  ['input','laporan','wa','setup'].forEach(id => {
+    el('tab-'+id)?.classList.toggle('active', id===t);
   });
-  e.target.value = '';
+  document.querySelectorAll('.tab').forEach((b,i) => {
+    b.classList.toggle('active', ['input','laporan','wa','setup'][i]===t);
+  });
 }
 
-function guessLabel(i) {
-  const labels = ['Arrival','Terminal','Departure','Apron','Penumpang','Dokumentasi'];
-  return labels[i] || 'Dokumentasi';
-}
-
-function renderPhotoGrid() {
-  const grid = el('photo-grid');
-  if (photos.length === 0) { grid.style.display = 'none'; return; }
-  grid.style.display = 'grid';
-  grid.innerHTML = photos.map((p, i) => `
-    <div class="photo-thumb">
-      <img src="${p.dataUrl}" alt="foto ${i+1}"/>
-      <button class="del" onclick="removePhoto(${i})">x</button>
-      <div class="lbl">${p.label}</div>
-    </div>
-  `).join('');
-}
-
-function removePhoto(i) {
-  photos.splice(i, 1);
-  renderPhotoGrid();
-}
-
-function saveConfig() {
-  const url   = el('cfg-url').value.trim();
-  const wa    = el('cfg-wa').value.trim();
-  const token = el('cfg-token') ? el('cfg-token').value.trim() : '';
-  if (!url) { showNotif('URL Web App wajib diisi!', 'err'); return; }
-  CFG.webAppUrl = url; CFG.waKakan = wa; CFG.waToken = token;
-  localStorage.setItem('pfi_url',   url);
-  localStorage.setItem('pfi_wa',    wa);
-  localStorage.setItem('pfi_token', token);
-  el('cfg-modal').style.display = 'none';
-  updateCfgStatus();
-  showNotif('Konfigurasi tersimpan!', 'ok');
-}
-
-function updateCfgStatus() {
-  const dot = el('cfg-dot'), lbl = el('cfg-label');
-  if (CFG.webAppUrl) { dot.style.background='#1D9E75'; lbl.textContent='Terhubung'; }
-  else               { dot.style.background='#F59E0B'; lbl.textContent='Konfigurasi'; }
-  el('cfg-url').value = CFG.webAppUrl;
-  el('cfg-wa').value  = CFG.waKakan;
-  if (el('cfg-token')) el('cfg-token').value = CFG.waToken;
-}
-
-function kirimWAOtomatis(payload) {
-  if (!CFG.webAppUrl) return;
-  let iframe = el('wa-iframe');
-  if (!iframe) {
-    iframe = document.createElement('iframe');
-    iframe.id = iframe.name = 'wa-iframe';
-    iframe.style.display = 'none';
-    document.body.appendChild(iframe);
-  }
-  let form = el('wa-form');
-  if (form) form.remove();
-  form = document.createElement('form');
-  form.id='wa-form'; form.method='POST';
-  form.action=CFG.webAppUrl; form.target='wa-iframe';
-  form.style.display='none';
-  const inp = document.createElement('input');
-  inp.type='hidden'; inp.name='data';
-  inp.value = JSON.stringify(payload);
-  form.appendChild(inp);
-  document.body.appendChild(form);
-  form.submit();
-}
-
-function buildPayload() {
-  return {
-    tanggal:v('tgl'), hari:v('hari'),
-    maskapai:v('maskapai'), operator:v('operator'),
-    reg:v('reg'), tipe:v('tipe'), rute:v('rute'),
-    flt_arr:v('flt_arr'), flt_dep:v('flt_dep'),
-    route_arr:v('route_arr'), route_dep:v('route_dep'),
-    sta:v('sta'), ata:v('ata'), std:v('std'), atd:v('atd'),
-    pax_arr_d:n('pd'), pax_arr_a:n('pa'), pax_arr_b:n('pb'),
-    pax_dep_d:n('dd'), pax_dep_a:n('da'), pax_dep_b:n('db'),
-    bgs_arr:n('bgs_a'), cgo_arr:n('cgo_a'),
-    bgs_dep:n('bgs_d'), cgo_dep:n('cgo_d'),
-    remark:v('remark'), catatan:v('catatan'), petugas:v('petugas'),
-    wa_number:CFG.waKakan,
-  };
+function showStatus(id, type, msg) {
+  const e = el(id);
+  if (!e) return;
+  e.style.display='block';
+  e.className='status-msg status-'+type;
+  e.textContent=msg;
 }
 
 function showNotif(msg, type) {
-  let notif = el('notif-bar');
-  if (!notif) {
-    notif = document.createElement('div');
-    notif.id = 'notif-bar';
-    notif.style.cssText = 'position:fixed;top:16px;right:16px;z-index:9999;padding:12px 18px;border-radius:9px;font-size:13px;font-weight:500;max-width:320px;box-shadow:0 4px 20px rgba(0,0,0,.3)';
-    document.body.appendChild(notif);
+  let nb=el('notif');
+  if (!nb) {
+    nb=document.createElement('div'); nb.id='notif';
+    nb.style.cssText='position:fixed;top:70px;right:16px;z-index:9999;padding:12px 18px;border-radius:10px;font-size:13px;font-weight:600;max-width:300px;box-shadow:0 4px 20px rgba(0,0,0,0.15);transition:opacity .4s;border-left:4px solid';
+    document.body.appendChild(nb);
   }
-  notif.style.background = type==='ok' ? '#1D9E75' : '#E24B4A';
-  notif.style.color = '#fff';
-  notif.style.opacity = '1';
-  notif.textContent = msg;
-  setTimeout(() => { notif.style.opacity='0'; }, 3500);
+  nb.style.background = type==='ok'?'#F6FFED':'#FFF2F0';
+  nb.style.borderLeftColor = type==='ok'?'#52C41A':'#FF4D4F';
+  nb.style.color = type==='ok'?'#389E0D':'#CF1322';
+  nb.style.opacity='1'; nb.textContent=msg;
+  setTimeout(()=>{nb.style.opacity='0';},4000);
 }
 
-function buildPDF() {
-  const tgl=v('tgl'), tglFmt=formatTgl(tgl);
-  const arrT=n('pd')+n('pa')+n('pb');
-  const depT=n('dd')+n('da')+n('db');
-  const dA=delay(v('sta'),v('ata'));
-  const dD=delay(v('std'),v('atd'));
+// CONFIG
+function openModal() {
+  el('cfg-url').value=CFG.webAppUrl;
+  el('cfg-wa').value=CFG.waKakan;
+  el('cfg-token').value=CFG.waToken;
+  el('cfg-modal').classList.add('open');
+}
+function closeModal() { el('cfg-modal').classList.remove('open'); }
 
-  el('p-tgl').textContent=tglFmt;
-  el('p-movement-title').textContent='Movement Report ' + tglFmt;
-  el('p-pax-arr-s').textContent=n('pd')+'/'+n('pa')+'/'+n('pb');
-  el('p-pax-dep-s').textContent=n('dd')+'/'+n('da')+'/'+n('db');
-  el('p-bgs-s').textContent=n('bgs_a')+n('bgs_d');
-  el('p-catatan').textContent=v('catatan');
-  el('p-kakan').textContent=v('kakan');
-  el('p-nip').textContent=v('nip')?'NIP. '+v('nip'):'';
-
-  const fotoSection=el('p-foto-section'), fotoGrid=el('p-foto-grid');
-  if (photos.length > 0) {
-    fotoSection.style.display='block';
-    fotoGrid.innerHTML = photos.map(p =>
-      '<div><img class="pf-img" src="'+p.dataUrl+'" alt="'+p.label+'"/><div class="pf-cat">'+p.label+'</div></div>'
-    ).join('');
-    for (let i=0; i<6-photos.length; i++) {
-      fotoGrid.innerHTML += '<div><div class="pf-img-placeholder">—</div></div>';
-    }
-  } else {
-    fotoSection.style.display='none';
+async function saveConfig() {
+  const url=el('cfg-url').value.trim(), wa=el('cfg-wa').value.trim(), token=el('cfg-token').value.trim();
+  if (!url) { showStatus('cfg-status','err','URL Web App wajib diisi'); return; }
+  showStatus('cfg-status','loading','Memeriksa koneksi...');
+  try {
+    const r=await fetch(url+'?action=rekap'); const j=await r.json();
+    if (j.status!=='ok') throw new Error(j.msg);
+    CFG.webAppUrl=url; CFG.waKakan=wa; CFG.waToken=token;
+    localStorage.setItem('pfi_url',url); localStorage.setItem('pfi_wa',wa); localStorage.setItem('pfi_token',token);
+    if (wa) el('wa-kakan').value=wa;
+    updateConnStatus();
+    showStatus('cfg-status','ok',`✅ Terhubung! ${j.total_flight} penerbangan di Sheets.`);
+    setTimeout(closeModal, 1500);
+  } catch(e) {
+    showStatus('cfg-status','err','Koneksi gagal: '+e.message);
   }
-
-  const aCls=dA>0?'td-delay':'';
-  el('p-arr-body').innerHTML='<tr><td>1</td><td>'+tgl+'</td><td class="td-bold">'+v('route_arr')+'</td><td>'+v('maskapai')+'</td><td>'+v('reg')+'</td><td>'+v('tipe')+'</td><td class="td-bold">'+v('flt_arr')+'</td><td>'+v('sta')+'</td><td class="'+aCls+'">'+v('ata')+(dA>0?' (+'+dA+')':'')+'</td><td>'+n('pd')+'</td><td>'+n('pa')+'</td><td>'+n('pb')+'</td><td class="td-bold">'+arrT+'</td><td>'+n('bgs_a')+'</td><td>'+(n('cgo_a')||'NIL')+'</td><td>A</td><td>'+v('remark')+'</td></tr>';
-
-  const dCls=dD>0?'td-delay':'';
-  el('p-dep-body').innerHTML='<tr><td>1</td><td>'+tgl+'</td><td class="td-bold">'+v('route_dep')+'</td><td>'+v('maskapai')+'</td><td>'+v('reg')+'</td><td>'+v('tipe')+'</td><td class="td-bold">'+v('flt_dep')+'</td><td>'+v('std')+'</td><td class="'+dCls+'">'+v('atd')+(dD>0?' (+'+dD+')':'')+'</td><td>'+n('dd')+'</td><td>'+n('da')+'</td><td>'+n('db')+'</td><td class="td-bold">'+depT+'</td><td>'+n('bgs_d')+'</td><td>'+(n('cgo_d')||'NIL')+'</td><td>D</td><td>'+v('remark')+'</td></tr>';
 }
 
-function previewPDF() {
-  buildPDF();
-  el('pdf-wrap').style.display='block';
-  el('screen').style.display='none';
-  window.scrollTo(0,0);
-}
-
-async function generateAndPrint() {
-  if (!v('tgl')) { showNotif('Tanggal wajib diisi!', 'err'); return; }
-
-  // 1. Build PDF content dulu
-  buildPDF();
-
-  // 2. Kirim teks WA + simpan Sheets (tidak perlu tunggu)
+function updateConnStatus() {
+  const dot=el('conn-dot'), lbl=el('conn-label');
+  const s3=el('step3-num'), s3st=el('step3-status');
   if (CFG.webAppUrl) {
-    kirimWAOtomatis(buildPayload());
+    dot.className='conn-dot ok'; lbl.textContent='Terhubung';
+    if(s3){s3.textContent='✓'; s3.style.background='#52C41A';}
+    if(s3st){s3st.textContent='aktif ✓'; s3st.style.color='#52C41A';}
   }
-
-  // 3. Tampilkan PDF page
-  const pdfWrap = el('pdf-wrap');
-  const screen  = el('screen');
-  if (pdfWrap) pdfWrap.style.display = 'block';
-  if (screen)  screen.style.display  = 'none';
-  window.scrollTo(0, 0);
-
-  // 4. Screenshot & kirim gambar WA
-  if (CFG.webAppUrl && CFG.waKakan && CFG.waToken) {
-    showNotif('⏳ Membuat screenshot laporan...', 'ok');
-    try {
-      // Tunggu render PDF selesai sebelum screenshot
-      await new Promise(r => setTimeout(r, 1200));
-
-      const pdfEl = document.querySelector('.pdf-page');
-      if (!pdfEl) throw new Error('Elemen PDF tidak ditemukan');
-
-      const canvas = await html2canvas(pdfEl, {
-        scale                : 1.5,
-        useCORS              : true,
-        allowTaint           : true,
-        backgroundColor      : '#ffffff',
-        logging              : false,
-        foreignObjectRendering: false,
-        imageTimeout         : 0,
-        removeContainer      : true,
-      });
-
-      const imageData = canvas.toDataURL('image/jpeg', 0.82);
-      const base64    = imageData.split(',')[1];
-
-      await kirimGambarWA(base64, CFG.waKakan);
-      showNotif('✅ Screenshot laporan terkirim ke WA Kepala Kantor!', 'ok');
-    } catch(err) {
-      console.error('Screenshot error:', err);
-      showNotif('⚠ ' + err.message + ' — teks WA tetap terkirim', 'err');
-    }
-  } else if (CFG.webAppUrl) {
-    showNotif('✅ Data & teks WA terkirim!', 'ok');
-  } else {
-    showNotif('⚠ Isi konfigurasi dulu agar WA terkirim', 'err');
-  }
-
-  // 5. Print dialog
-  setTimeout(() => window.print(), 1500);
 }
 
+// SUBMIT DATA
+function kirimKeAppsScript(payload) {
+  if (!CFG.webAppUrl) return;
+  let iframe=el('sub-iframe');
+  if (!iframe) { iframe=document.createElement('iframe'); iframe.id=iframe.name='sub-iframe'; iframe.style.display='none'; document.body.appendChild(iframe); }
+  let form=el('sub-form'); if(form) form.remove();
+  form=document.createElement('form'); form.id='sub-form'; form.method='POST'; form.action=CFG.webAppUrl; form.target='sub-iframe'; form.style.display='none';
+  const inp=document.createElement('input'); inp.type='hidden'; inp.name='data'; inp.value=JSON.stringify(payload);
+  form.appendChild(inp); document.body.appendChild(form); form.submit();
+}
 
-async function buatGambarLaporan() {
-  // Buat gambar laporan ringkas pakai Canvas API murni — tidak ada request eksternal
-  const W = 900, H = 1200;
-  const cv = document.createElement('canvas');
-  cv.width = W; cv.height = H;
-  const ctx = cv.getContext('2d');
-
-  const NAVY  = '#1A3A5C';
-  const GOLD  = '#E6A817';
-  const WHITE = '#FFFFFF';
-  const LGRAY = '#F4F6F9';
-  const DGRAY = '#7A8FA6';
-
-  // Helper functions
-  function rect(x,y,w,h,color){ ctx.fillStyle=color; ctx.fillRect(x,y,w,h); }
-  function text(t,x,y,size,color,align='left',bold=false){
-    ctx.font=(bold?'bold ':'')+size+'px Arial';
-    ctx.fillStyle=color; ctx.textAlign=align; ctx.fillText(t,x,y);
-  }
-  function roundRect(x,y,w,h,r,color){
-    ctx.fillStyle=color; ctx.beginPath();
-    ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y);
-    ctx.quadraticCurveTo(x+w,y,x+w,y+r);
-    ctx.lineTo(x+w,y+h-r); ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
-    ctx.lineTo(x+r,y+h); ctx.quadraticCurveTo(x,y+h,x,y+h-r);
-    ctx.lineTo(x,y+r); ctx.quadraticCurveTo(x,y,x+r,y);
-    ctx.closePath(); ctx.fill();
-  }
-  function line(x1,y1,x2,y2,color,w=1){
-    ctx.strokeStyle=color; ctx.lineWidth=w;
-    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
-  }
-  function wrapText(t,x,y,maxW,lineH,size,color){
-    ctx.font=size+'px Arial'; ctx.fillStyle=color; ctx.textAlign='left';
-    const words=t.split(' '); let line='';
-    for(let w of words){
-      const test=line+w+' ';
-      if(ctx.measureText(test).width>maxW && line!==''){
-        ctx.fillText(line,x,y); line=w+' '; y+=lineH;
-      } else line=test;
-    }
-    ctx.fillText(line,x,y);
-    return y;
-  }
-
-  // Data dari form
-  const tglFmt  = formatTgl(v('tgl'));
-  const arrT    = n('pd')+n('pa')+n('pb');
-  const depT    = n('dd')+n('da')+n('db');
-  const dA      = delay(v('sta'),v('ata'));
-  const dD      = delay(v('std'),v('atd'));
-
-  // ── HEADER NAVY ──────────────────────────────────────────────
-  rect(0,0,W,100,NAVY);
-  // Logo circle
-  ctx.fillStyle=GOLD; ctx.beginPath(); ctx.arc(54,50,32,0,Math.PI*2); ctx.fill();
-  ctx.fillStyle=NAVY; ctx.font='bold 13px Arial'; ctx.textAlign='center';
-  ctx.fillText('UPBU',54,46); ctx.fillText('KSR',54,62);
-  // Title
-  text('Kantor UPBU H. Aroeppala Selayar',100,40,16,WHITE,'left',true);
-  text('Direktorat Jenderal Perhubungan Udara — Kementerian Perhubungan RI',100,62,11,DGRAY);
-  // Date
-  ctx.textAlign='right';
-  text('Tanggal:',W-20,36,10,DGRAY,'right');
-  text(tglFmt,W-20,56,13,GOLD,'right',true);
-
-  // ── GOLD STRIP ───────────────────────────────────────────────
-  rect(0,100,W,5,GOLD);
-
-  // ── TITLE BLOCK ──────────────────────────────────────────────
-  rect(0,105,W,70,LGRAY);
-  text('LAPORAN PENERBANGAN HARIAN',W/2,138,20,NAVY,'center',true);
-  text('UPBU H. Aroeppala Selayar — Unit LLAU',W/2,162,12,GOLD,'center',true);
-  line(0,175,W,175,GOLD,2);
-
-  // ── FOTO SECTION ─────────────────────────────────────────────
-  let y = 185;
-  if (photos.length > 0) {
-    rect(0,y,W,30,NAVY);
-    text('DOKUMENTASI PENERBANGAN',20,y+20,12,GOLD,'left',true);
-    y += 35;
-    const cols = Math.min(photos.length, 3);
-    const imgW = Math.floor((W-40-(cols-1)*10)/cols);
-    const imgH = Math.floor(imgW*3/4);
-    const promises = photos.slice(0,cols).map((p,i) => new Promise(res => {
-      const img = new Image();
-      img.onload = () => {
-        const x = 20 + i*(imgW+10);
-        // Draw image
-        ctx.drawImage(img, x, y, imgW, imgH);
-        // Label
-        roundRect(x, y+imgH-24, imgW, 24, 0, 'rgba(0,0,0,0.6)');
-        ctx.font='bold 11px Arial'; ctx.fillStyle=WHITE; ctx.textAlign='center';
-        ctx.fillText(p.label, x+imgW/2, y+imgH-9);
-        res();
-      };
-      img.onerror = res;
-      img.src = p.dataUrl;
-    }));
-    await Promise.all(promises);
-    y += imgH + 15;
-    line(0,y,W,y,'#ddd',1); y+=10;
-  }
-
-  // ── SUMMARY CARDS (gold) ──────────────────────────────────────
-  rect(0,y,W,130,GOLD);
-  text('Movement Report — '+tglFmt,W/2,y+26,14,NAVY,'center',true);
-  y += 36;
-  const cards = [
-    {label:'Pesawat Datang/Berangkat', val:'1 / 1'},
-    {label:'Penumpang Datang', val:n('pd')+'/'+n('pa')+'/'+n('pb')},
-    {label:'Penumpang Berangkat', val:n('dd')+'/'+n('da')+'/'+n('db')},
-    {label:'Total Bagasi (kg)', val:String(n('bgs_a')+n('bgs_d'))},
-  ];
-  const cW=(W-60)/4, cH=70;
-  cards.forEach((c,i)=>{
-    const cx=20+i*(cW+13), cy=y;
-    roundRect(cx,cy,cW,cH,8,'rgba(255,255,255,0.45)');
-    ctx.font='bold 22px Arial'; ctx.fillStyle=NAVY; ctx.textAlign='center';
-    ctx.fillText(c.val, cx+cW/2, cy+36);
-    ctx.font='9px Arial'; ctx.fillStyle='#333';
-    ctx.fillText(c.label, cx+cW/2, cy+54);
-  });
-  y += cH + 20;
-
-  // ── DETAIL TABLE ──────────────────────────────────────────────
-  const drawRow = (label,val,yy,bg)=>{
-    rect(20,yy,W-40,28,bg);
-    text(label,30,yy+19,11,DGRAY,'left',true);
-    text(val,W-30,yy+19,11,NAVY,'right',true);
-    line(20,yy+28,W-20,yy+28,'#eee',1);
-    return yy+28;
+function submitData() {
+  if (!v('tgl')) { showStatus('submit-status','err','Tanggal wajib diisi!'); return; }
+  const arrT=n('pd')+n('pa')+n('pb'), depT=n('dd')+n('da')+n('db');
+  const payload={
+    tanggal:v('tgl'),hari:v('hari'),maskapai:v('maskapai'),operator:v('operator'),
+    reg:v('reg'),tipe:v('tipe'),rute:v('rute'),
+    flt_arr:v('flt_arr'),flt_dep:v('flt_dep'),route_arr:v('route_arr'),route_dep:v('route_dep'),
+    sta:v('sta'),ata:v('ata'),std:v('std'),atd:v('atd'),
+    pax_arr_d:n('pd'),pax_arr_a:n('pa'),pax_arr_b:n('pb'),
+    pax_dep_d:n('dd'),pax_dep_a:n('da'),pax_dep_b:n('db'),
+    bgs_arr:n('bgs_a'),cgo_arr:n('cgo_a'),bgs_dep:n('bgs_d'),cgo_dep:n('cgo_d'),
+    remark:v('remark'),catatan:v('catatan'),petugas:v('petugas'),wa_number:CFG.waKakan,
   };
-
-  // ARR header
-  roundRect(20,y,180,26,4,NAVY);
-  text('🛬  ARRIVAL ('+v('flt_arr')+')',30,y+18,11,WHITE,'left',true);
-  y+=30;
-  y=drawRow('Route ARR',v('route_arr'),y,WHITE);
-  y=drawRow('STA / ATA',v('sta')+' / '+v('ata')+' LT'+(dA>0?' (delay '+dA+' mnt)':'  ✓'),y,dA>0?'#FFF8E1':WHITE);
-  y=drawRow('Pax Tiba',n('pd')+'/'+n('pa')+'/'+n('pb')+' = '+arrT+' Org',y,WHITE);
-  y=drawRow('Bagasi Tiba',n('bgs_a')+' kg',y,LGRAY);
-  y+=8;
-
-  // DEP header
-  roundRect(20,y,200,26,4,'#245080');
-  text('🛫  DEPARTURE ('+v('flt_dep')+')',30,y+18,11,WHITE,'left',true);
-  y+=30;
-  y=drawRow('Route DEP',v('route_dep'),y,WHITE);
-  y=drawRow('STD / ATD',v('std')+' / '+v('atd')+' LT'+(dD>0?' (delay '+dD+' mnt)':'  ✓'),y,dD>0?'#FFF8E1':WHITE);
-  y=drawRow('Pax Berangkat',n('dd')+'/'+n('da')+'/'+n('db')+' = '+depT+' Org',y,WHITE);
-  y=drawRow('Bagasi Berangkat',n('bgs_d')+' kg',y,LGRAY);
-  y+=10;
-
-  // ── CATATAN ───────────────────────────────────────────────────
-  line(20,y,W-20,y,GOLD,2); y+=14;
-  text('Catatan:',20,y,11,NAVY,'left',true); y+=18;
-  y = wrapText(v('catatan'),20,y,W-40,18,11,DGRAY) + 20;
-
-  // ── REMARK ────────────────────────────────────────────────────
-  roundRect(20,y,W-40,36,8,NAVY);
-  text('Status: '+v('remark'),W/2,y+23,13,GOLD,'center',true);
-  y+=50;
-
-  // ── FOOTER ───────────────────────────────────────────────────
-  const footY = H-55;
-  rect(0,footY,W,55,NAVY);
-  text('BANDAR UDARA H. AROEPPALA',W/2,footY+20,13,GOLD,'center',true);
-  text('☎ 0852-2034-8115  |  aroeppalaairport@gmail.com  |  Jl. Poros Padang, Kab. Kepulauan Selayar',W/2,footY+38,9,'rgba(255,255,255,0.65)','center');
-  text('Dibuat otomatis oleh Post-Flight Intelligence System',W/2,footY+52,8,'rgba(255,255,255,0.4)','center');
-
-  return cv.toDataURL('image/jpeg',0.88).split(',')[1];
-}
-
-async function kirimGambarWA(base64, nomor) {
-  // Kirim via Apps Script (proxy) — hindari CSP block dari GitHub Pages
-  const caption =
-    '📋 *LAPORAN PENERBANGAN HARIAN*\n' +
-    '*UPBU H. Aroeppala Selayar*\n' +
-    '📅 ' + formatTgl(v('tgl')) + '\n' +
-    '✈️ ' + v('flt_arr') + '/' + v('flt_dep') + ' — ' + v('maskapai') + '\n' +
-    '_(Laporan lengkap terlampir)_';
-
-  // Kirim base64 gambar ke Apps Script, lalu Apps Script yang kirim ke Fonnte
-  const payload = {
-    action   : 'kirim_gambar',
-    base64   : base64,
-    nomor    : nomor,
-    caption  : caption,
-    wa_token : CFG.waToken,
-  };
-
-  // Gunakan iframe form trick sama seperti submit data (bypass CSP)
-  let iframe = document.getElementById('img-iframe');
-  if (!iframe) {
-    iframe = document.createElement('iframe');
-    iframe.id = iframe.name = 'img-iframe';
-    iframe.style.display = 'none';
-    document.body.appendChild(iframe);
+  if (!CFG.webAppUrl) {
+    showStatus('submit-status','err','URL Web App belum dikonfigurasi. Klik Konfigurasi di pojok kanan atas.');
+    return;
   }
-  let form = document.getElementById('img-form');
-  if (form) form.remove();
-  form = document.createElement('form');
-  form.id = 'img-form';
-  form.method = 'POST';
-  form.action = CFG.webAppUrl;
-  form.target = 'img-iframe';
-  form.style.display = 'none';
-  const inp = document.createElement('input');
-  inp.type = 'hidden';
-  inp.name = 'data';
-  inp.value = JSON.stringify(payload);
-  form.appendChild(inp);
-  document.body.appendChild(form);
-  form.submit();
-
-  // Tidak bisa dapat response dari iframe (no-cors), anggap berhasil
-  await new Promise(r => setTimeout(r, 1500));
-  return { status: true };
+  kirimKeAppsScript(payload);
+  // Update preview sekaligus
+  el('preview-text').textContent=buildLaporan();
+  el('wa-text').textContent=buildWA();
+  showStatus('submit-status','ok','✅ Data terkirim ke Google Sheets & WA Kepala Kantor!');
+  setTimeout(()=>{ el('submit-status').style.display='none'; },5000);
 }
 
-function backToForm() {
-  el('pdf-wrap').style.display='none';
-  el('screen').style.display='block';
-  window.scrollTo(0,0);
+// BUILD TEXTS
+function buildLaporan() {
+  const tgl=formatTgl(v('tgl')), arrT=n('pd')+n('pa')+n('pb'), depT=n('dd')+n('da')+n('db');
+  const dA=delay(v('sta'),v('ata')), dD=delay(v('std'),v('atd'));
+  return `LAPORAN PENERBANGAN HARIAN
+KANTOR UPBU H. AROEPPALA SELAYAR
+${v('hari')}, ${tgl}
+
+Kepada Yth.
+Dirjen Perhubungan Udara • Sesditjen Perhubungan Udara
+Direktur Bandar Udara • Direktur Angkutan Udara
+Kepala Kantor OBU Wilayah V Makassar
+
+Dengan hormat, disampaikan laporan ${v('remark')} ${v('maskapai')}
+Rute ${v('rute')} pada hari ${v('hari')}, ${tgl}
+di Bandar Udara H. Aroeppala Selayar.
+
+OPERATOR : ${v('operator')}
+Flt No   : ${v('flt_arr')} - ${v('flt_dep')}
+Reg      : ${v('reg')}
+Type     : ${v('tipe')}
+Rute     : ${v('rute')}
+
+─── ARRIVAL (${v('flt_arr')}) ───
+Route ARR  : ${v('route_arr')}
+STA / ATA  : ${v('sta')} / ${v('ata')} LT${dA>0?` (Delay ${dA} mnt)`:''}
+Pax Tiba   : ${n('pd')}/${n('pa')}/${n('pb')} = ${arrT} Org
+Bagasi     : ${n('bgs_a')} KG
+Kargo      : ${n('cgo_a')===0?'NIL':n('cgo_a')+' KG'}
+
+─── DEPARTURE (${v('flt_dep')}) ───
+Route DEP  : ${v('route_dep')}
+STD / ATD  : ${v('std')} / ${v('atd')} LT${dD>0?` (Delay ${dD} mnt)`:''}
+Pax Brgkt  : ${n('dd')}/${n('da')}/${n('db')} = ${depT} Org
+Bagasi     : ${n('bgs_d')} KG
+Kargo      : ${n('cgo_d')===0?'NIL':n('cgo_d')+' KG'}
+
+─── REKAPITULASI ───
+Total Pax ARR    : ${arrT} Org
+Total Pax DEP    : ${depT} Org
+Grand Total Pax  : ${arrT+depT} Org
+Total Bagasi     : ${n('bgs_a')+n('bgs_d')} KG
+Status           : ${v('remark')}
+
+Catatan:
+${v('catatan')}
+
+Kegiatan berjalan aman dan lancar.
+Demikian dilaporkan, terima kasih.
+
+Hormat kami,
+Kepala UPBU H. Aroeppala Selayar`;
 }
 
-window.addEventListener('DOMContentLoaded', () => {
-  const today = new Date().toISOString().split('T')[0];
-  el('tgl').value = today;
-  onTgl(); calc();
-  updateCfgStatus();
-  if (!CFG.webAppUrl) setTimeout(()=>{ el('cfg-modal').style.display='flex'; }, 500);
+function buildWA() {
+  const tgl=formatTgl(v('tgl')), arrT=n('pd')+n('pa')+n('pb'), depT=n('dd')+n('da')+n('db');
+  const dA=delay(v('sta'),v('ata')), dD=delay(v('std'),v('atd'));
+  return `✈️ *LAPORAN PENERBANGAN HARIAN*
+*UPBU H. Aroeppala Selayar*
+📅 ${v('hari')}, ${tgl}
+
+*${v('maskapai')} — ${v('flt_arr')}/${v('flt_dep')}*
+🛩 ${v('tipe')} | ${v('reg')}
+🗺 Rute: ${v('rute')}
+
+━━━━━━━━━━━━━━━
+🛬 *ARRIVAL* (${v('flt_arr')})
+• STA/ATA: ${v('sta')}/${v('ata')} LT${dA>0?` _(delay ${dA} mnt)_`:' ✅'}
+• Pax: ${arrT} Org (D:${n('pd')} A:${n('pa')} B:${n('pb')})
+• Bagasi: ${n('bgs_a')} kg | Kargo: ${n('cgo_a')===0?'NIL':n('cgo_a')+' kg'}
+
+🛫 *DEPARTURE* (${v('flt_dep')})
+• STD/ATD: ${v('std')}/${v('atd')} LT${dD>0?` _(delay ${dD} mnt)_`:' ✅'}
+• Pax: ${depT} Org (D:${n('dd')} A:${n('da')} B:${n('db')})
+• Bagasi: ${n('bgs_d')} kg | Kargo: ${n('cgo_d')===0?'NIL':n('cgo_d')+' kg'}
+
+━━━━━━━━━━━━━━━
+📊 *REKAPITULASI*
+• Grand Total Pax : ${arrT+depT} Org
+• Total Bagasi    : ${n('bgs_a')+n('bgs_d')} kg
+• Status          : ${v('remark')} ✅
+
+📝 _${v('catatan')}_
+
+_Dilaporkan oleh: ${v('petugas')||'Unit LLAU'}_
+_UPBU Kelas III H. Aroeppala Selayar_`;
+}
+
+function generatePreview() { calc(); calcDelay(); el('preview-text').textContent=buildLaporan(); el('wa-text').textContent=buildWA(); }
+function goLaporan() { generatePreview(); switchTab('laporan'); }
+function goWA()      { generatePreview(); switchTab('wa'); }
+
+function cetakPDF() {
+  generatePreview();
+  const tgl=formatTgl(v('tgl')), arrT=n('pd')+n('pa')+n('pb'), depT=n('dd')+n('da')+n('db');
+  const dA=delay(v('sta'),v('ata')), dD=delay(v('std'),v('atd'));
+  el('pdf-content').innerHTML=`
+<div class="pdf-header">
+  <div>
+    <div style="font-size:16pt;font-weight:700;letter-spacing:1px">Kantor UPBU H. Aroeppala Selayar</div>
+    <div style="font-size:8pt;opacity:.7;margin-top:3px">Direktorat Jenderal Perhubungan Udara — Kementerian Perhubungan RI</div>
+  </div>
+  <div style="text-align:right">
+    <div style="font-size:8pt;opacity:.6">Tanggal:</div>
+    <div style="font-size:11pt;font-weight:700;color:#FFD700;margin-top:2px">${v('hari')}, ${tgl}</div>
+  </div>
+</div>
+<div class="pdf-gold-bar"></div>
+<div class="pdf-title">
+  <h1>Laporan Penerbangan Harian</h1>
+  <p>Kepada Yth. Dirjen Perhubungan Udara • Sesditjen • Direktur Bandar Udara • Kepala OBU Wil. V Makassar</p>
+</div>
+<div class="pdf-summary">
+  <div class="pdf-sum-card"><div class="pdf-sum-n">1/1</div><div class="pdf-sum-l">Datang/Berangkat</div></div>
+  <div class="pdf-sum-card"><div class="pdf-sum-n">${n('pd')}/${n('pa')}/${n('pb')}</div><div class="pdf-sum-l">Penumpang Datang</div></div>
+  <div class="pdf-sum-card"><div class="pdf-sum-n">${n('dd')}/${n('da')}/${n('db')}</div><div class="pdf-sum-l">Penumpang Berangkat</div></div>
+  <div class="pdf-sum-card"><div class="pdf-sum-n">${n('bgs_a')+n('bgs_d')}</div><div class="pdf-sum-l">Total Bagasi (kg)</div></div>
+</div>
+<div class="pdf-body">
+  <div class="pdf-section">ARRIVAL</div>
+  <table class="pdf-tbl"><thead><tr><th>No</th><th>Tanggal</th><th>Route ARR</th><th>AOC</th><th>Reg</th><th>Type</th><th>Flt No</th><th>STA</th><th>ATA</th><th>D</th><th>A</th><th>B</th><th>Total</th><th>Bagasi</th><th>Kargo</th><th>Remark</th></tr></thead>
+  <tbody><tr><td>1</td><td>${v('tgl')}</td><td>${v('route_arr')}</td><td>${v('maskapai')}</td><td>${v('reg')}</td><td>${v('tipe')}</td><td>${v('flt_arr')}</td><td>${v('sta')}</td><td style="${dA>0?'color:#D0021B;font-weight:700':''}">${v('ata')}${dA>0?` (+${dA})`:''}</td><td>${n('pd')}</td><td>${n('pa')}</td><td>${n('pb')}</td><td><b>${arrT}</b></td><td>${n('bgs_a')}</td><td>${n('cgo_a')||'NIL'}</td><td>${v('remark')}</td></tr></tbody></table>
+  <div class="pdf-section dep" style="margin-top:4mm">DEPARTURE</div>
+  <table class="pdf-tbl"><thead><tr><th>No</th><th>Tanggal</th><th>Route DEP</th><th>AOC</th><th>Reg</th><th>Type</th><th>Flt No</th><th>STD</th><th>ATD</th><th>D</th><th>A</th><th>B</th><th>Total</th><th>Bagasi</th><th>Kargo</th><th>Remark</th></tr></thead>
+  <tbody><tr><td>1</td><td>${v('tgl')}</td><td>${v('route_dep')}</td><td>${v('maskapai')}</td><td>${v('reg')}</td><td>${v('tipe')}</td><td>${v('flt_dep')}</td><td>${v('std')}</td><td style="${dD>0?'color:#D0021B;font-weight:700':''}">${v('atd')}${dD>0?` (+${dD})`:''}</td><td>${n('dd')}</td><td>${n('da')}</td><td>${n('db')}</td><td><b>${depT}</b></td><td>${n('bgs_d')}</td><td>${n('cgo_d')||'NIL'}</td><td>${v('remark')}</td></tr></tbody></table>
+</div>
+<div class="pdf-catatan"><b>Catatan:</b><br><i>${v('catatan')}</i></div>
+<div class="pdf-ttd"><div class="pdf-ttd-box"><div>Hormat kami,</div><div style="font-size:8pt;color:#666;margin-top:2px">Kepala Kantor UPBU H. Aroeppala Selayar</div><div style="height:50px"></div><div style="font-weight:700;text-decoration:underline">Hery Sugianto, S.T.</div></div></div>
+<div class="pdf-footer"><span>BANDAR UDARA H. AROEPPALA SELAYAR</span><span>☎ 0852-2034-8115 | aroeppalaairport@gmail.com</span><span>Jl. Poros Padang, Kab. Kepulauan Selayar</span></div>`;
+  el('pdf-print').style.display='block';
+  setTimeout(()=>{ window.print(); setTimeout(()=>{ el('pdf-print').style.display='none'; },1000); },300);
+}
+
+function copyPreview() { navigator.clipboard.writeText(el('preview-text').textContent).then(()=>showNotif('Teks laporan disalin!','ok')); }
+function copyWA()      { navigator.clipboard.writeText(el('wa-text').textContent).then(()=>showNotif('Pesan WA disalin!','ok')); }
+
+function kirimWA(which) {
+  const txt=el('wa-text').textContent||buildWA();
+  const num=(which===1?v('wa-kakan'):v('wa-other')).replace(/\D/g,'');
+  if (!num) { navigator.clipboard.writeText(txt).then(()=>showNotif('Nomor belum diisi — pesan disalin, buka WA manual','err')); return; }
+  window.open(`https://wa.me/${num}?text=${encodeURIComponent(txt)}`,'_blank');
+}
+
+window.addEventListener('DOMContentLoaded',()=>{
+  const today=new Date().toISOString().split('T')[0];
+  el('tgl').value=today; onTgl(); calc();
+  updateConnStatus();
+  if (CFG.waKakan) el('wa-kakan').value=CFG.waKakan;
+  if (!CFG.webAppUrl) setTimeout(openModal,600);
 });
 </script>
 </body>
