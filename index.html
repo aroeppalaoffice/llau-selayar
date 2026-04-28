@@ -868,32 +868,34 @@ Balas HANYA dalam format JSON berikut tanpa teks lain:
 }`;
 
   try {
-    const resp = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${CFG.geminiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { maxOutputTokens: 500, temperature: 0.3 }
-        })
-      }
-    );
+    // Kirim ke Apps Script via GET (tidak kena CSP GitHub Pages)
+    const params = new URLSearchParams({
+      action   : 'analisis_ai',
+      tanggal  : v('tgl'), maskapai: v('maskapai'),
+      tipe     : v('tipe'), reg: v('reg'), rute: v('rute'),
+      flt_arr  : v('flt_arr'), flt_dep: v('flt_dep'),
+      sta: v('sta'), ata: v('ata'), std: v('std'), atd: v('atd'),
+      pd: n('pd'), pa: n('pa'), pb: n('pb'),
+      dd: n('dd'), da: n('da'), db: n('db'),
+      bgs_a: n('bgs_a'), bgs_d: n('bgs_d'),
+      cgo_a: n('cgo_a'), cgo_d: n('cgo_d'),
+      remark   : v('remark'),
+      gemini_key: CFG.geminiKey,
+    });
 
-    const data = await resp.json();
-    const raw  = data.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
-    const clean = raw.replace(/```json|```/g, '').trim();
-    const result = JSON.parse(clean);
+    const resp = await fetch(CFG.webAppUrl + '?' + params.toString());
+    const result = await resp.json();
+    if (result.status !== 'ok') throw new Error(result.msg || 'Gagal analisis');
 
-    // Tampilkan hasil
-    el('ai-load-factor').textContent = loadFactor + '%';
-    el('ai-tren').textContent        = result.tren || 'Normal';
-    el('ai-narasi').textContent      = result.narasi || '';
-    el('ai-status').textContent      = result.status_ops || 'Lancar';
+    // Tampilkan hasil dari Apps Script
+    el('ai-load-factor').textContent = result.load_factor || (loadFactor + '%');
+    el('ai-tren').textContent        = result.tren        || 'Normal';
+    el('ai-narasi').textContent      = result.narasi      || '';
+    el('ai-status').textContent      = result.status_ops  || 'Lancar';
     el('ai-result').style.display    = 'block';
 
     // Simpan narasi untuk dipakai
-    window._aiNarasi = result.narasi;
+    window._aiNarasi = result.narasi || '';
     showNotif('✦ Analisis AI selesai!', 'ok');
 
   } catch(err) {
