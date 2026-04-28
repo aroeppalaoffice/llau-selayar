@@ -930,166 +930,139 @@ function renderPhotoGrid() {
     </div>`).join('');
 }
 
+
 function cetakPDF() {
   generatePreview();
-  const tgl = formatTgl(v('tgl'));
+  const tgl  = formatTgl(v('tgl'));
   const arrT = n('pd')+n('pa')+n('pb');
   const depT = n('dd')+n('da')+n('db');
-  const dA = delay(v('sta'),v('ata'));
-  const dD = delay(v('std'),v('atd'));
+  const dA   = delay(v('sta'),v('ata'));
+  const dD   = delay(v('std'),v('atd'));
 
-  // Build photo grid HTML
+  // Build photo grid
   let photoHTML = '';
   if (photos.length > 0) {
-    const slots = Array.from({length: 6}, (_, i) => photos[i] || null);
-    const row1 = slots.slice(0,3).map(p => p
-      ? `<div style="position:relative;border-radius:8px;overflow:hidden;aspect-ratio:4/3"><img src="${p.dataUrl}" style="width:100%;height:100%;object-fit:cover"/>`
-      : `<div style="aspect-ratio:4/3;background:rgba(255,255,255,0.05);border-radius:8px;border:1px dashed rgba(255,255,255,0.2)"></div>`
-    ).join('');
-    const row2 = slots.slice(3,6).map(p => p
-      ? `<div style="position:relative;border-radius:8px;overflow:hidden;aspect-ratio:4/3"><img src="${p.dataUrl}" style="width:100%;height:100%;object-fit:cover"/>`
-      : `<div style="aspect-ratio:4/3;background:rgba(255,255,255,0.05);border-radius:8px;border:1px dashed rgba(255,255,255,0.2)"></div>`
-    ).join('');
+    const slots = Array.from({length:6}, (_,i) => photos[i]||null);
+    const makeCell = (p) => p
+      ? `<div style="position:relative;overflow:hidden;border-radius:6px"><img src="${p.dataUrl}" style="width:100%;height:120px;object-fit:cover;display:block"/></div>`
+      : `<div style="height:120px;background:rgba(255,255,255,0.05);border-radius:6px;border:1px dashed rgba(255,255,255,0.15)"></div>`;
     photoHTML = `
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:6px">${row1}</div>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">${row2}</div>`;
+    <div style="background:#001F4D;padding:10px 16px">
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:6px">
+        ${slots.slice(0,3).map(makeCell).join('')}
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">
+        ${slots.slice(3,6).map(makeCell).join('')}
+      </div>
+    </div>`;
   }
 
-  el('pdf-content').innerHTML = `
-<div style="font-family:Arial,sans-serif;width:210mm;min-height:297mm;background:#fff">
+  const printDiv = el('pdf-print');
+  printDiv.innerHTML = `
+<style>
+  @page{margin:0;size:A4}
+  body{margin:0;padding:0}
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important}
+  .pdf{font-family:Arial,sans-serif;width:210mm;background:#fff}
+  table{border-collapse:collapse;width:100%}
+  th,td{padding:3px 5px;font-size:6.5pt;text-align:center;border:.5px solid #ddd}
+  th{background:#003580;color:#fff;font-size:6pt}
+</style>
+<div class="pdf">
 
-  <!-- HEADER NAVY -->
-  <div style="background:#003580;padding:10mm 14mm 8mm;display:flex;justify-content:space-between;align-items:center">
+  <!-- HEADER -->
+  <div style="background:#003580!important;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;-webkit-print-color-adjust:exact">
     <div style="display:flex;align-items:center;gap:10px">
-      <div style="width:48px;height:48px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-        <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
-          <circle cx="18" cy="18" r="17" stroke="#003580" stroke-width="2"/>
-          <path d="M9 26L18 10L27 26" stroke="#003580" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-          <path d="M13 26L18 17L23 26" fill="#D0021B"/>
-          <rect x="14" y="26" width="8" height="4" rx="1" fill="#D0021B"/>
-        </svg>
-      </div>
+      <img src="${logo_b64}" style="width:52px;height:52px;border-radius:50%;object-fit:cover"/>
       <div>
-        <div style="font-size:14pt;font-weight:700;color:#fff;letter-spacing:.5px">Kantor UPBU H. Aroeppala Selayar</div>
-        <div style="font-size:7.5pt;color:rgba(255,255,255,.65);margin-top:2px">Direktorat Jenderal Perhubungan Udara — Kementerian Perhubungan RI</div>
+        <div style="font-size:14pt;font-weight:700;color:#fff">Kantor UPBU H. Aroeppala Selayar</div>
+        <div style="font-size:7.5pt;color:rgba(255,255,255,0.7);margin-top:2px">Direktorat Jenderal Perhubungan Udara — Kementerian Perhubungan RI</div>
       </div>
     </div>
     <div style="text-align:right">
-      <div style="font-size:7pt;color:rgba(255,255,255,.5)">Tanggal:</div>
+      <div style="font-size:7pt;color:rgba(255,255,255,0.5)">Tanggal:</div>
       <div style="font-size:11pt;font-weight:700;color:#FFD700;margin-top:2px">${tgl}</div>
     </div>
   </div>
 
   <!-- TITLE -->
-  <div style="background:#003580;padding:4mm 14mm;text-align:center;border-top:1px solid rgba(255,255,255,.1)">
+  <div style="background:#003580!important;padding:8px 16px;text-align:center;border-top:1px solid rgba(255,255,255,0.1);-webkit-print-color-adjust:exact">
     <div style="font-size:20pt;font-weight:900;color:#fff;letter-spacing:3px">DATA LLAU</div>
-    <div style="font-size:8pt;color:rgba(255,255,255,.7);letter-spacing:4px;margin-top:2px">BANDARA H. AROEPPALA — SELAYAR</div>
+    <div style="font-size:8pt;color:rgba(255,255,255,0.65);letter-spacing:4px;margin-top:2px">BANDARA H. AROEPPALA — SELAYAR</div>
   </div>
 
-  <!-- FOTO GRID -->
-  ${photos.length > 0 ? `
-  <div style="background:#001F4D;padding:6mm 14mm">
-    ${photoHTML}
-  </div>` : ''}
+  <!-- FOTO -->
+  ${photoHTML}
 
-  <!-- MOVEMENT REPORT GOLD -->
-  <div style="background:#E6A817;padding:6mm 14mm">
-    <div style="font-size:13pt;font-weight:900;color:#003580;text-align:center;margin-bottom:5mm">
-      Movement Report ${tgl}
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6mm">
+  <!-- MOVEMENT REPORT -->
+  <div style="background:#E6A817!important;padding:10px 16px;-webkit-print-color-adjust:exact">
+    <div style="font-size:13pt;font-weight:900;color:#003580;text-align:center;margin-bottom:8px">Movement Report ${tgl}</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
       <div>
-        <div style="font-size:11pt;font-weight:900;color:#003580;margin-bottom:3mm">PERGERAKAN PESAWAT</div>
-        <div style="font-size:10pt;color:#003580"><i><b>DATANG &nbsp;&nbsp;&nbsp;&nbsp;: 1</b></i></div>
-        <div style="font-size:10pt;color:#003580;margin-top:2mm"><i><b>BERANGKAT : 1</b></i></div>
+        <div style="font-size:11pt;font-weight:900;color:#003580;margin-bottom:4px">PERGERAKAN PESAWAT</div>
+        <div style="font-size:10pt;color:#003580;font-style:italic;font-weight:700">DATANG &nbsp;&nbsp;&nbsp;&nbsp;: 1</div>
+        <div style="font-size:10pt;color:#003580;font-style:italic;font-weight:700;margin-top:3px">BERANGKAT : 1</div>
       </div>
       <div>
-        <div style="font-size:11pt;font-weight:900;color:#003580;margin-bottom:3mm">BAGASI</div>
-        <div style="font-size:10pt;color:#003580"><i><b>DATANG &nbsp;&nbsp;&nbsp;&nbsp;: ${n('bgs_a')} Kg</b></i></div>
-        <div style="font-size:10pt;color:#003580;margin-top:2mm"><i><b>BERANGKAT : ${n('bgs_d')} Kg</b></i></div>
+        <div style="font-size:11pt;font-weight:900;color:#003580;margin-bottom:4px">BAGASI</div>
+        <div style="font-size:10pt;color:#003580;font-style:italic;font-weight:700">DATANG &nbsp;&nbsp;&nbsp;&nbsp;: ${n('bgs_a')} Kg</div>
+        <div style="font-size:10pt;color:#003580;font-style:italic;font-weight:700;margin-top:3px">BERANGKAT : ${n('bgs_d')} Kg</div>
       </div>
-      <div style="margin-top:3mm">
-        <div style="font-size:11pt;font-weight:900;color:#003580;margin-bottom:3mm">PENUMPANG</div>
-        <div style="font-size:10pt;color:#003580"><i><b>DATANG &nbsp;&nbsp;&nbsp;&nbsp;: ${n('pd')}/${n('pa')}/${n('pb')}</b></i></div>
-        <div style="font-size:10pt;color:#003580;margin-top:2mm"><i><b>BERANGKAT : ${n('dd')}/${n('da')}/${n('db')}</b></i></div>
+      <div style="margin-top:6px">
+        <div style="font-size:11pt;font-weight:900;color:#003580;margin-bottom:4px">PENUMPANG</div>
+        <div style="font-size:10pt;color:#003580;font-style:italic;font-weight:700">DATANG &nbsp;&nbsp;&nbsp;&nbsp;: ${n('pd')}/${n('pa')}/${n('pb')}</div>
+        <div style="font-size:10pt;color:#003580;font-style:italic;font-weight:700;margin-top:3px">BERANGKAT : ${n('dd')}/${n('da')}/${n('db')}</div>
       </div>
-      <div style="margin-top:3mm">
-        <div style="font-size:11pt;font-weight:900;color:#003580;margin-bottom:3mm">KARGO</div>
-        <div style="font-size:10pt;color:#003580"><i><b>DATANG &nbsp;&nbsp;&nbsp;&nbsp;: ${n('cgo_a') ? n('cgo_a')+' Kg' : '-'}</b></i></div>
-        <div style="font-size:10pt;color:#003580;margin-top:2mm"><i><b>BERANGKAT : ${n('cgo_d') ? n('cgo_d')+' Kg' : '-'}</b></i></div>
+      <div style="margin-top:6px">
+        <div style="font-size:11pt;font-weight:900;color:#003580;margin-bottom:4px">KARGO</div>
+        <div style="font-size:10pt;color:#003580;font-style:italic;font-weight:700">DATANG &nbsp;&nbsp;&nbsp;&nbsp;: ${n('cgo_a')||'-'}</div>
+        <div style="font-size:10pt;color:#003580;font-style:italic;font-weight:700;margin-top:3px">BERANGKAT : ${n('cgo_d')||'-'}</div>
       </div>
     </div>
   </div>
 
-  <!-- DETAIL TABEL -->
-  <div style="padding:4mm 14mm;background:#fff">
-    <div style="font-size:7pt;font-weight:700;color:#fff;background:#003580;padding:3px 8px;border-radius:3px 3px 0 0;display:inline-block">ARRIVAL</div>
-    <table style="width:100%;border-collapse:collapse;font-size:6.5pt">
-      <thead><tr style="background:#003580;color:#fff">
-        <th style="padding:3px 4px">No</th><th>Tanggal</th><th>Route</th><th>AOC</th><th>Reg</th><th>Type</th><th>Flt No</th><th>STA</th><th>ATA</th><th>D</th><th>A</th><th>B</th><th>Total</th><th>Bagasi</th><th>Kargo</th><th>Remark</th>
-      </tr></thead>
+  <!-- TABEL -->
+  <div style="padding:8px 16px">
+    <div style="background:#003580!important;color:#fff;font-size:7pt;font-weight:700;padding:3px 6px;display:inline-block;margin-bottom:1px;-webkit-print-color-adjust:exact">ARRIVAL</div>
+    <table>
+      <thead><tr><th>No</th><th>Tanggal</th><th>Route ARR</th><th>AOC</th><th>Reg</th><th>Type AC</th><th>Flt No</th><th>STA (LT)</th><th>ATA (LT)</th><th>D</th><th>A</th><th>B</th><th>Total</th><th>Bagasi (kg)</th><th>Kargo (kg)</th><th>Remark</th></tr></thead>
       <tbody><tr style="background:#F4F6FA">
-        <td style="padding:3px 4px;border:.5px solid #ddd;text-align:center">1</td>
-        <td style="padding:3px 4px;border:.5px solid #ddd;text-align:center">${v('tgl')}</td>
-        <td style="padding:3px 4px;border:.5px solid #ddd;text-align:center;font-weight:700">${v('route_arr')}</td>
-        <td style="padding:3px 4px;border:.5px solid #ddd;text-align:center">${v('maskapai')}</td>
-        <td style="padding:3px 4px;border:.5px solid #ddd;text-align:center">${v('reg')}</td>
-        <td style="padding:3px 4px;border:.5px solid #ddd;text-align:center">${v('tipe')}</td>
-        <td style="padding:3px 4px;border:.5px solid #ddd;text-align:center;font-weight:700">${v('flt_arr')}</td>
-        <td style="padding:3px 4px;border:.5px solid #ddd;text-align:center">${v('sta')}</td>
-        <td style="padding:3px 4px;border:.5px solid #ddd;text-align:center;${dA>0?'color:#D0021B;font-weight:700':''}">${v('ata')}${dA>0?` (+${dA})`:''}</td>
-        <td style="padding:3px 4px;border:.5px solid #ddd;text-align:center">${n('pd')}</td>
-        <td style="padding:3px 4px;border:.5px solid #ddd;text-align:center">${n('pa')}</td>
-        <td style="padding:3px 4px;border:.5px solid #ddd;text-align:center">${n('pb')}</td>
-        <td style="padding:3px 4px;border:.5px solid #ddd;text-align:center;font-weight:700">${arrT}</td>
-        <td style="padding:3px 4px;border:.5px solid #ddd;text-align:center">${n('bgs_a')}</td>
-        <td style="padding:3px 4px;border:.5px solid #ddd;text-align:center">${n('cgo_a')||'NIL'}</td>
-        <td style="padding:3px 4px;border:.5px solid #ddd;text-align:center">${v('remark')}</td>
+        <td>1</td><td>${v('tgl')}</td><td style="font-weight:700">${v('route_arr')}</td><td>${v('maskapai')}</td><td>${v('reg')}</td><td>${v('tipe')}</td><td style="font-weight:700">${v('flt_arr')}</td>
+        <td>${v('sta')}</td><td style="${dA>0?'color:#D0021B;font-weight:700':''}">${v('ata')}${dA>0?` (+${dA})`:''}</td>
+        <td>${n('pd')}</td><td>${n('pa')}</td><td>${n('pb')}</td><td style="font-weight:700">${arrT}</td><td>${n('bgs_a')}</td><td>${n('cgo_a')||'NIL'}</td><td>${v('remark')}</td>
       </tr></tbody>
     </table>
-    <div style="margin-top:4mm;font-size:7pt;font-weight:700;color:#fff;background:#1677FF;padding:3px 8px;border-radius:3px 3px 0 0;display:inline-block">DEPARTURE</div>
-    <table style="width:100%;border-collapse:collapse;font-size:6.5pt">
-      <thead><tr style="background:#1677FF;color:#fff">
-        <th style="padding:3px 4px">No</th><th>Tanggal</th><th>Route</th><th>AOC</th><th>Reg</th><th>Type</th><th>Flt No</th><th>STD</th><th>ATD</th><th>D</th><th>A</th><th>B</th><th>Total</th><th>Bagasi</th><th>Kargo</th><th>Remark</th>
-      </tr></thead>
+
+    <div style="background:#1677FF!important;color:#fff;font-size:7pt;font-weight:700;padding:3px 6px;display:inline-block;margin-top:6px;margin-bottom:1px;-webkit-print-color-adjust:exact">DEPARTURE</div>
+    <table>
+      <thead style="background:#1677FF!important"><tr style="background:#1677FF!important"><th style="background:#1677FF!important">No</th><th style="background:#1677FF!important">Tanggal</th><th style="background:#1677FF!important">Route DEP</th><th style="background:#1677FF!important">AOC</th><th style="background:#1677FF!important">Reg</th><th style="background:#1677FF!important">Type AC</th><th style="background:#1677FF!important">Flt No</th><th style="background:#1677FF!important">STD (LT)</th><th style="background:#1677FF!important">ATD (LT)</th><th style="background:#1677FF!important">D</th><th style="background:#1677FF!important">A</th><th style="background:#1677FF!important">B</th><th style="background:#1677FF!important">Total</th><th style="background:#1677FF!important">Bagasi (kg)</th><th style="background:#1677FF!important">Kargo (kg)</th><th style="background:#1677FF!important">Remark</th></tr></thead>
       <tbody><tr style="background:#F4F6FA">
-        <td style="padding:3px 4px;border:.5px solid #ddd;text-align:center">1</td>
-        <td style="padding:3px 4px;border:.5px solid #ddd;text-align:center">${v('tgl')}</td>
-        <td style="padding:3px 4px;border:.5px solid #ddd;text-align:center;font-weight:700">${v('route_dep')}</td>
-        <td style="padding:3px 4px;border:.5px solid #ddd;text-align:center">${v('maskapai')}</td>
-        <td style="padding:3px 4px;border:.5px solid #ddd;text-align:center">${v('reg')}</td>
-        <td style="padding:3px 4px;border:.5px solid #ddd;text-align:center">${v('tipe')}</td>
-        <td style="padding:3px 4px;border:.5px solid #ddd;text-align:center;font-weight:700">${v('flt_dep')}</td>
-        <td style="padding:3px 4px;border:.5px solid #ddd;text-align:center">${v('std')}</td>
-        <td style="padding:3px 4px;border:.5px solid #ddd;text-align:center;${dD>0?'color:#D0021B;font-weight:700':''}">${v('atd')}${dD>0?` (+${dD})`:''}</td>
-        <td style="padding:3px 4px;border:.5px solid #ddd;text-align:center">${n('dd')}</td>
-        <td style="padding:3px 4px;border:.5px solid #ddd;text-align:center">${n('da')}</td>
-        <td style="padding:3px 4px;border:.5px solid #ddd;text-align:center">${n('db')}</td>
-        <td style="padding:3px 4px;border:.5px solid #ddd;text-align:center;font-weight:700">${depT}</td>
-        <td style="padding:3px 4px;border:.5px solid #ddd;text-align:center">${n('bgs_d')}</td>
-        <td style="padding:3px 4px;border:.5px solid #ddd;text-align:center">${n('cgo_d')||'NIL'}</td>
-        <td style="padding:3px 4px;border:.5px solid #ddd;text-align:center">${v('remark')}</td>
+        <td>1</td><td>${v('tgl')}</td><td style="font-weight:700">${v('route_dep')}</td><td>${v('maskapai')}</td><td>${v('reg')}</td><td>${v('tipe')}</td><td style="font-weight:700">${v('flt_dep')}</td>
+        <td>${v('std')}</td><td style="${dD>0?'color:#D0021B;font-weight:700':''}">${v('atd')}${dD>0?` (+${dD})`:''}</td>
+        <td>${n('dd')}</td><td>${n('da')}</td><td>${n('db')}</td><td style="font-weight:700">${depT}</td><td>${n('bgs_d')}</td><td>${n('cgo_d')||'NIL'}</td><td>${v('remark')}</td>
       </tr></tbody>
     </table>
   </div>
 
   <!-- FOOTER -->
-  <div style="background:#003580;padding:4px 14mm;display:flex;justify-content:space-between;align-items:center;margin-top:auto">
-    <div style="display:flex;gap:16px">
-      <span style="font-size:7pt;color:rgba(255,255,255,.7)">☎ 0852-2034-8115</span>
-      <span style="font-size:7pt;color:rgba(255,255,255,.7)">✉ aroeppalaairport@gmail.com</span>
-    </div>
-    <div style="font-size:7pt;color:rgba(255,255,255,.7)">Jl. Ahmad Dg. Marimba, Kab. Kepulauan Selayar, Sulawesi Selatan</div>
+  <div style="background:#003580!important;padding:5px 16px;display:flex;justify-content:space-between;align-items:center;margin-top:8px;-webkit-print-color-adjust:exact">
+    <span style="font-size:7pt;color:rgba(255,255,255,0.75)">☎ 0852-2034-8115</span>
+    <span style="font-size:7pt;color:rgba(255,255,255,0.75)">✉ aroeppalaairport@gmail.com</span>
+    <span style="font-size:7pt;color:rgba(255,255,255,0.75)">Jl. Ahmad Dg. Marimba, Kab. Kepulauan Selayar, Sulawesi Selatan</span>
   </div>
-
 
 </div>`;
 
-  el('pdf-print').style.display = 'block';
-  setTimeout(() => {
+  printDiv.style.display = 'block';
+  // Hide everything else
+  document.querySelectorAll('body > *:not(#pdf-print)').forEach(e => e.style.display='none');
+  setTimeout(()=>{
     window.print();
-    setTimeout(() => { el('pdf-print').style.display = 'none'; }, 1000);
-  }, 400);
+    setTimeout(()=>{
+      printDiv.style.display='none';
+      document.querySelectorAll('body > *:not(#pdf-print)').forEach(e => e.style.display='');
+    },1000);
+  },300);
 }
 
 
