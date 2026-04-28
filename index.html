@@ -501,6 +501,30 @@ code{background:var(--biru-muda);color:var(--biru);padding:1px 6px;border-radius
         <label>Catatan</label>
         <textarea id="catatan">seluruh aktivitas pelayanan penerbangan telah berjalan dengan lancar dan dilaksanakan sesuai dengan standar operasional yang berlaku.</textarea>
       </div>
+      <div class="full" style="margin-top:4px">
+        <button class="btn" id="btn-ai" onclick="analisisAI()" style="background:linear-gradient(135deg,#6C47FF,#4A90E2);color:#fff;border:none;padding:10px 16px;border-radius:var(--r);font-size:13px;font-weight:600;cursor:pointer;width:100%;display:flex;align-items:center;justify-content:center;gap:8px">
+          <span>✦</span> <span id="ai-btn-text">Analisis AI — Generate Load Factor & Narasi</span>
+        </button>
+        <div id="ai-result" style="display:none;margin-top:10px;background:linear-gradient(135deg,#F0EEFF,#E6F0FF);border:1px solid #C4B5FD;border-radius:var(--r);padding:12px 14px">
+          <div style="font-size:10px;font-weight:700;color:#6C47FF;letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px">✦ Hasil Analisis Post-Flight Intelligence</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px">
+            <div style="background:#fff;border-radius:7px;padding:8px;text-align:center;border:1px solid #E0D9FF">
+              <div style="font-size:18px;font-weight:700;color:#6C47FF" id="ai-load-factor">—</div>
+              <div style="font-size:10px;color:#888;margin-top:2px">Load Factor</div>
+            </div>
+            <div style="background:#fff;border-radius:7px;padding:8px;text-align:center;border:1px solid #E0D9FF">
+              <div style="font-size:14px;font-weight:700;color:#003580" id="ai-tren">—</div>
+              <div style="font-size:10px;color:#888;margin-top:2px">Tren</div>
+            </div>
+            <div style="background:#fff;border-radius:7px;padding:8px;text-align:center;border:1px solid #E0D9FF">
+              <div style="font-size:14px;font-weight:700;color:#389E0D" id="ai-status">—</div>
+              <div style="font-size:10px;color:#888;margin-top:2px">Status Ops</div>
+            </div>
+          </div>
+          <div style="font-size:12px;color:#333;line-height:1.7;background:#fff;border-radius:7px;padding:10px;border:1px solid #E0D9FF" id="ai-narasi">—</div>
+          <button onclick="pakaiNarasi()" style="margin-top:8px;width:100%;padding:8px;background:#6C47FF;color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer">✓ Pakai Narasi Ini sebagai Catatan</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -660,9 +684,10 @@ const BULAN_N = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agust
 let photos = [];
 
 const CFG = {
-  webAppUrl : localStorage.getItem('pfi_url')   || '',
-  waKakan   : localStorage.getItem('pfi_wa')    || '',
-  waToken   : localStorage.getItem('pfi_token') || '',
+  webAppUrl  : localStorage.getItem('pfi_url')    || '',
+  waKakan    : localStorage.getItem('pfi_wa')     || '',
+  waToken    : localStorage.getItem('pfi_token')  || '',
+  geminiKey  : localStorage.getItem('pfi_gemini') || '',
 };
 
 const v  = id => document.getElementById(id)?.value || '';
@@ -784,6 +809,102 @@ function kirimKeAppsScript(payload) {
   form=document.createElement('form'); form.id='sub-form'; form.method='POST'; form.action=CFG.webAppUrl; form.target='sub-iframe'; form.style.display='none';
   const inp=document.createElement('input'); inp.type='hidden'; inp.name='data'; inp.value=JSON.stringify(payload);
   form.appendChild(inp); document.body.appendChild(form); form.submit();
+}
+
+
+// ── ANALISIS AI (Gemini) ──────────────────────────────────────
+async function analisisAI() {
+  if (!CFG.geminiKey) {
+    showNotif('Isi Gemini API Key dulu di Konfigurasi!', 'err');
+    openModal();
+    return;
+  }
+  if (!v('tgl')) { showNotif('Isi tanggal dulu!', 'err'); return; }
+
+  const btn = el('btn-ai');
+  const btnText = el('ai-btn-text');
+  btn.disabled = true;
+  btnText.textContent = '⏳ Menganalisis data...';
+
+  const arrT = n('pd')+n('pa')+n('pb');
+  const depT = n('dd')+n('da')+n('db');
+  const grandTotal = arrT + depT;
+  const loadFactor = ((grandTotal / 2 / 72) * 100).toFixed(1);
+  const dA = delay(v('sta'), v('ata'));
+  const dD = delay(v('std'), v('atd'));
+
+  const prompt = `Kamu adalah analis operasional penerbangan sipil Indonesia yang profesional.
+
+Data penerbangan hari ini di Bandar Udara H. Aroeppala Selayar:
+- Tanggal: ${formatTgl(v('tgl'))}
+- Maskapai: ${v('maskapai')} (${v('tipe')}, Reg: ${v('reg')})
+- Rute: ${v('rute')}
+- Flight ARR/DEP: ${v('flt_arr')} / ${v('flt_dep')}
+- STA/ATA: ${v('sta')} / ${v('ata')} LT ${dA > 0 ? '(delay ' + dA + ' menit)' : '(on time)'}
+- STD/ATD: ${v('std')} / ${v('atd')} LT ${dD > 0 ? '(delay ' + dD + ' menit)' : '(on time)'}
+- Penumpang Tiba: Dewasa ${n('pd')}, Anak ${n('pa')}, Bayi ${n('pb')} = ${arrT} org
+- Penumpang Berangkat: Dewasa ${n('dd')}, Anak ${n('da')}, Bayi ${n('db')} = ${depT} org
+- Grand Total Penumpang: ${grandTotal} org
+- Bagasi Tiba: ${n('bgs_a')} kg | Bagasi Berangkat: ${n('bgs_d')} kg
+- Kargo: Tiba ${n('cgo_a')||0} kg | Berangkat ${n('cgo_d')||0} kg
+- Load Factor terkalkulasi: ${loadFactor}% (dari kapasitas 72 seat)
+- Status: ${v('remark')}
+
+Tugasmu:
+1. Tentukan tren operasional: Padat / Normal / Rendah (berdasarkan load factor)
+2. Tentukan status operasional hari ini (1-2 kata)
+3. Buat narasi resmi 2-3 kalimat dalam Bahasa Indonesia formal untuk laporan harian kepada pimpinan. Narasi harus mencakup: kondisi penerbangan, load factor, dan kondisi delay jika ada.
+
+Balas HANYA dalam format JSON berikut tanpa teks lain:
+{
+  "tren": "Normal",
+  "status_ops": "Lancar",
+  "narasi": "narasi resmi 2-3 kalimat di sini"
+}`;
+
+  try {
+    const resp = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${CFG.geminiKey}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: { maxOutputTokens: 500, temperature: 0.3 }
+        })
+      }
+    );
+
+    const data = await resp.json();
+    const raw  = data.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
+    const clean = raw.replace(/```json|```/g, '').trim();
+    const result = JSON.parse(clean);
+
+    // Tampilkan hasil
+    el('ai-load-factor').textContent = loadFactor + '%';
+    el('ai-tren').textContent        = result.tren || 'Normal';
+    el('ai-narasi').textContent      = result.narasi || '';
+    el('ai-status').textContent      = result.status_ops || 'Lancar';
+    el('ai-result').style.display    = 'block';
+
+    // Simpan narasi untuk dipakai
+    window._aiNarasi = result.narasi;
+    showNotif('✦ Analisis AI selesai!', 'ok');
+
+  } catch(err) {
+    showNotif('Error: ' + err.message, 'err');
+    console.error(err);
+  } finally {
+    btn.disabled  = false;
+    btnText.textContent = '✦ Analisis AI — Generate Load Factor & Narasi';
+  }
+}
+
+function pakaiNarasi() {
+  if (window._aiNarasi) {
+    el('catatan').value = window._aiNarasi;
+    showNotif('Narasi AI berhasil dimasukkan ke kolom Catatan!', 'ok');
+  }
 }
 
 function submitData() {
