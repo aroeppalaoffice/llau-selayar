@@ -817,7 +817,7 @@ function buildLaporan() {
   const dA=delay(v('sta'),v('ata')), dD=delay(v('std'),v('atd'));
   return `LAPORAN PENERBANGAN HARIAN
 KANTOR UPBU H. AROEPPALA SELAYAR
-${v('hari')}, ${tgl}
+${tgl}
 
 Kepada Yth.
 Dirjen Perhubungan Udara • Sesditjen Perhubungan Udara
@@ -825,7 +825,7 @@ Direktur Bandar Udara • Direktur Angkutan Udara
 Kepala Kantor OBU Wilayah V Makassar
 
 Dengan hormat, disampaikan laporan ${v('remark')} ${v('maskapai')}
-Rute ${v('rute')} pada hari ${v('hari')}, ${tgl}
+Rute ${v('rute')} pada hari ${tgl}
 di Bandar Udara H. Aroeppala Selayar.
 
 OPERATOR : ${v('operator')}
@@ -870,7 +870,7 @@ function buildWA() {
   const dA=delay(v('sta'),v('ata')), dD=delay(v('std'),v('atd'));
   return `✈️ *LAPORAN PENERBANGAN HARIAN*
 *UPBU H. Aroeppala Selayar*
-📅 ${v('hari')}, ${tgl}
+📅 ${tgl}
 
 *${v('maskapai')} — ${v('flt_arr')}/${v('flt_dep')}*
 🛩 ${v('tipe')} | ${v('reg')}
@@ -976,7 +976,7 @@ function cetakPDF() {
     </div>
     <div style="text-align:right">
       <div style="font-size:7pt;color:rgba(255,255,255,.5)">Tanggal:</div>
-      <div style="font-size:11pt;font-weight:700;color:#FFD700;margin-top:2px">${v('hari')}, ${tgl}</div>
+      <div style="font-size:11pt;font-weight:700;color:#FFD700;margin-top:2px">${tgl}</div>
     </div>
   </div>
 
