@@ -948,7 +948,7 @@ function cetakPDF() {
       ? `<div style="overflow:hidden;border-radius:4px"><img src="${p.dataUrl}" style="width:100%;height:115px;object-fit:cover;display:block"/></div>`
       : `<div style="height:115px;background:rgba(255,255,255,0.04);border-radius:4px"></div>`;
     photoHTML = `
-    <div style="background:#001F4D;padding:8px 14px">
+    <div style="background:#001F4D;padding:8px 14px;margin:0;width:100%;box-sizing:border-box">
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-bottom:5px">
         ${slots.slice(0,3).map(makeCell).join('')}
       </div>
@@ -961,17 +961,17 @@ function cetakPDF() {
   const printDiv = el('pdf-print');
   printDiv.innerHTML = `
 <style>
-  @page{margin:0;size:A4}
+  @page{margin:0;size:A4} html,body{margin:0;padding:0;width:100%}
   *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
   body{margin:0;padding:0;font-family:Arial,sans-serif}
   table{border-collapse:collapse;width:100%}
   th,td{padding:3px 4px;font-size:6.5pt;text-align:center;border:.5px solid #ddd}
   th{color:#fff;font-size:6pt}
 </style>
-<div style="width:210mm;background:#fff;font-family:Arial,sans-serif">
+<div style="width:100%;background:#fff;font-family:Arial,sans-serif;margin:0;padding:0">
 
   <!-- HEADER NAVY -->
-  <div style="background:#003580;padding:10px 16px;display:flex;justify-content:space-between;align-items:center">
+  <div style="background:#003580;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;margin:0;width:100%;box-sizing:border-box">
     <div>
       <div style="font-size:14pt;font-weight:700;color:#fff">Kantor UPBU H. Aroeppala Selayar</div>
       <div style="font-size:7.5pt;color:rgba(255,255,255,0.7);margin-top:2px">Direktorat Jenderal Perhubungan Udara — Kementerian Perhubungan RI</div>
@@ -983,7 +983,7 @@ function cetakPDF() {
   </div>
 
   <!-- TITLE -->
-  <div style="background:#003580;padding:8px 16px;text-align:center;border-top:1px solid rgba(255,255,255,0.1)">
+  <div style="background:#003580;padding:8px 16px;text-align:center;border-top:1px solid rgba(255,255,255,0.1);margin:0;width:100%;box-sizing:border-box">
     <div style="font-size:20pt;font-weight:900;color:#fff;letter-spacing:3px">DATA LLAU</div>
     <div style="font-size:8pt;color:rgba(255,255,255,0.65);letter-spacing:4px;margin-top:2px">BANDARA H. AROEPPALA — SELAYAR</div>
   </div>
@@ -992,7 +992,7 @@ function cetakPDF() {
   ${photoHTML}
 
   <!-- MOVEMENT REPORT GOLD -->
-  <div style="background:#E6A817;padding:10px 16px">
+  <div style="background:#E6A817;padding:10px 16px;margin:0;width:100%;box-sizing:border-box">
     <div style="font-size:13pt;font-weight:900;color:#003580;text-align:center;margin-bottom:8px">Movement Report ${tgl}</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
       <div>
@@ -1073,7 +1073,7 @@ function cetakPDF() {
   </div>
 
   <!-- FOOTER KONTAK SAJA -->
-  <div style="background:#003580;padding:5px 16px;display:flex;justify-content:space-between;align-items:center">
+  <div style="background:#003580;padding:5px 16px;display:flex;justify-content:space-between;align-items:center;margin:0;width:100%;box-sizing:border-box">
     <span style="font-size:7pt;color:rgba(255,255,255,0.75)">☎ 0852-2034-8115</span>
     <span style="font-size:7pt;color:rgba(255,255,255,0.75)">✉ aroeppalaairport@gmail.com</span>
     <span style="font-size:7pt;color:rgba(255,255,255,0.75)">Jl. Ahmad Dg. Marimba, Kab. Kepulauan Selayar, Sulawesi Selatan</span>
@@ -1082,6 +1082,7 @@ function cetakPDF() {
 </div>`;
 
   printDiv.style.display = 'block';
+  printDiv.style.lineHeight = '0';
   document.querySelectorAll('body > *:not(#pdf-print)').forEach(e => e.style.display='none');
   setTimeout(()=>{
     window.print();
