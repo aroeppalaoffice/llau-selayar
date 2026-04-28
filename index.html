@@ -931,6 +931,7 @@ function renderPhotoGrid() {
 }
 
 
+
 function cetakPDF() {
   generatePreview();
   const tgl  = formatTgl(v('tgl'));
@@ -939,19 +940,19 @@ function cetakPDF() {
   const dA   = delay(v('sta'),v('ata'));
   const dD   = delay(v('std'),v('atd'));
 
-  // Build photo grid
+  // Build photo grid — no labels, no logo
   let photoHTML = '';
   if (photos.length > 0) {
     const slots = Array.from({length:6}, (_,i) => photos[i]||null);
     const makeCell = (p) => p
-      ? `<div style="position:relative;overflow:hidden;border-radius:6px"><img src="${p.dataUrl}" style="width:100%;height:120px;object-fit:cover;display:block"/></div>`
-      : `<div style="height:120px;background:rgba(255,255,255,0.05);border-radius:6px;border:1px dashed rgba(255,255,255,0.15)"></div>`;
+      ? `<div style="overflow:hidden;border-radius:4px"><img src="${p.dataUrl}" style="width:100%;height:115px;object-fit:cover;display:block"/></div>`
+      : `<div style="height:115px;background:rgba(255,255,255,0.04);border-radius:4px"></div>`;
     photoHTML = `
-    <div style="background:#001F4D;padding:10px 16px">
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:6px">
+    <div style="background:#001F4D;padding:8px 14px">
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-bottom:5px">
         ${slots.slice(0,3).map(makeCell).join('')}
       </div>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px">
         ${slots.slice(3,6).map(makeCell).join('')}
       </div>
     </div>`;
@@ -961,23 +962,19 @@ function cetakPDF() {
   printDiv.innerHTML = `
 <style>
   @page{margin:0;size:A4}
-  body{margin:0;padding:0}
-  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important}
-  .pdf{font-family:Arial,sans-serif;width:210mm;background:#fff}
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  body{margin:0;padding:0;font-family:Arial,sans-serif}
   table{border-collapse:collapse;width:100%}
-  th,td{padding:3px 5px;font-size:6.5pt;text-align:center;border:.5px solid #ddd}
-  th{background:#003580;color:#fff;font-size:6pt}
+  th,td{padding:3px 4px;font-size:6.5pt;text-align:center;border:.5px solid #ddd}
+  th{color:#fff;font-size:6pt}
 </style>
-<div class="pdf">
+<div style="width:210mm;background:#fff;font-family:Arial,sans-serif">
 
-  <!-- HEADER -->
-  <div style="background:#003580!important;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;-webkit-print-color-adjust:exact">
-    <div style="display:flex;align-items:center;gap:10px">
-      <img src="${logo_b64}" style="width:52px;height:52px;border-radius:50%;object-fit:cover"/>
-      <div>
-        <div style="font-size:14pt;font-weight:700;color:#fff">Kantor UPBU H. Aroeppala Selayar</div>
-        <div style="font-size:7.5pt;color:rgba(255,255,255,0.7);margin-top:2px">Direktorat Jenderal Perhubungan Udara — Kementerian Perhubungan RI</div>
-      </div>
+  <!-- HEADER NAVY -->
+  <div style="background:#003580;padding:10px 16px;display:flex;justify-content:space-between;align-items:center">
+    <div>
+      <div style="font-size:14pt;font-weight:700;color:#fff">Kantor UPBU H. Aroeppala Selayar</div>
+      <div style="font-size:7.5pt;color:rgba(255,255,255,0.7);margin-top:2px">Direktorat Jenderal Perhubungan Udara — Kementerian Perhubungan RI</div>
     </div>
     <div style="text-align:right">
       <div style="font-size:7pt;color:rgba(255,255,255,0.5)">Tanggal:</div>
@@ -986,16 +983,16 @@ function cetakPDF() {
   </div>
 
   <!-- TITLE -->
-  <div style="background:#003580!important;padding:8px 16px;text-align:center;border-top:1px solid rgba(255,255,255,0.1);-webkit-print-color-adjust:exact">
+  <div style="background:#003580;padding:8px 16px;text-align:center;border-top:1px solid rgba(255,255,255,0.1)">
     <div style="font-size:20pt;font-weight:900;color:#fff;letter-spacing:3px">DATA LLAU</div>
     <div style="font-size:8pt;color:rgba(255,255,255,0.65);letter-spacing:4px;margin-top:2px">BANDARA H. AROEPPALA — SELAYAR</div>
   </div>
 
-  <!-- FOTO -->
+  <!-- FOTO (no labels) -->
   ${photoHTML}
 
-  <!-- MOVEMENT REPORT -->
-  <div style="background:#E6A817!important;padding:10px 16px;-webkit-print-color-adjust:exact">
+  <!-- MOVEMENT REPORT GOLD -->
+  <div style="background:#E6A817;padding:10px 16px">
     <div style="font-size:13pt;font-weight:900;color:#003580;text-align:center;margin-bottom:8px">Movement Report ${tgl}</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
       <div>
@@ -1021,31 +1018,62 @@ function cetakPDF() {
     </div>
   </div>
 
-  <!-- TABEL -->
-  <div style="padding:8px 16px">
-    <div style="background:#003580!important;color:#fff;font-size:7pt;font-weight:700;padding:3px 6px;display:inline-block;margin-bottom:1px;-webkit-print-color-adjust:exact">ARRIVAL</div>
+  <!-- TABEL ARRIVAL -->
+  <div style="padding:8px 16px 4px">
+    <div style="background:#003580;color:#fff;font-size:7pt;font-weight:700;padding:3px 6px;display:inline-block;margin-bottom:1px">ARRIVAL</div>
     <table>
-      <thead><tr><th>No</th><th>Tanggal</th><th>Route ARR</th><th>AOC</th><th>Reg</th><th>Type AC</th><th>Flt No</th><th>STA (LT)</th><th>ATA (LT)</th><th>D</th><th>A</th><th>B</th><th>Total</th><th>Bagasi (kg)</th><th>Kargo (kg)</th><th>Remark</th></tr></thead>
+      <thead><tr>
+        <th style="background:#003580">No</th><th style="background:#003580">Tanggal</th>
+        <th style="background:#003580">Route ARR</th><th style="background:#003580">AOC</th>
+        <th style="background:#003580">Reg</th><th style="background:#003580">Type AC</th>
+        <th style="background:#003580">Flt No</th><th style="background:#003580">STA (LT)</th>
+        <th style="background:#003580">ATA (LT)</th><th style="background:#003580">D</th>
+        <th style="background:#003580">A</th><th style="background:#003580">B</th>
+        <th style="background:#003580">Total</th><th style="background:#003580">Bagasi</th>
+        <th style="background:#003580">Kargo</th><th style="background:#003580">Remark</th>
+      </tr></thead>
       <tbody><tr style="background:#F4F6FA">
-        <td>1</td><td>${v('tgl')}</td><td style="font-weight:700">${v('route_arr')}</td><td>${v('maskapai')}</td><td>${v('reg')}</td><td>${v('tipe')}</td><td style="font-weight:700">${v('flt_arr')}</td>
-        <td>${v('sta')}</td><td style="${dA>0?'color:#D0021B;font-weight:700':''}">${v('ata')}${dA>0?` (+${dA})`:''}</td>
-        <td>${n('pd')}</td><td>${n('pa')}</td><td>${n('pb')}</td><td style="font-weight:700">${arrT}</td><td>${n('bgs_a')}</td><td>${n('cgo_a')||'NIL'}</td><td>${v('remark')}</td>
-      </tr></tbody>
-    </table>
-
-    <div style="background:#1677FF!important;color:#fff;font-size:7pt;font-weight:700;padding:3px 6px;display:inline-block;margin-top:6px;margin-bottom:1px;-webkit-print-color-adjust:exact">DEPARTURE</div>
-    <table>
-      <thead style="background:#1677FF!important"><tr style="background:#1677FF!important"><th style="background:#1677FF!important">No</th><th style="background:#1677FF!important">Tanggal</th><th style="background:#1677FF!important">Route DEP</th><th style="background:#1677FF!important">AOC</th><th style="background:#1677FF!important">Reg</th><th style="background:#1677FF!important">Type AC</th><th style="background:#1677FF!important">Flt No</th><th style="background:#1677FF!important">STD (LT)</th><th style="background:#1677FF!important">ATD (LT)</th><th style="background:#1677FF!important">D</th><th style="background:#1677FF!important">A</th><th style="background:#1677FF!important">B</th><th style="background:#1677FF!important">Total</th><th style="background:#1677FF!important">Bagasi (kg)</th><th style="background:#1677FF!important">Kargo (kg)</th><th style="background:#1677FF!important">Remark</th></tr></thead>
-      <tbody><tr style="background:#F4F6FA">
-        <td>1</td><td>${v('tgl')}</td><td style="font-weight:700">${v('route_dep')}</td><td>${v('maskapai')}</td><td>${v('reg')}</td><td>${v('tipe')}</td><td style="font-weight:700">${v('flt_dep')}</td>
-        <td>${v('std')}</td><td style="${dD>0?'color:#D0021B;font-weight:700':''}">${v('atd')}${dD>0?` (+${dD})`:''}</td>
-        <td>${n('dd')}</td><td>${n('da')}</td><td>${n('db')}</td><td style="font-weight:700">${depT}</td><td>${n('bgs_d')}</td><td>${n('cgo_d')||'NIL'}</td><td>${v('remark')}</td>
+        <td>1</td><td>${v('tgl')}</td>
+        <td style="font-weight:700">${v('route_arr')}</td><td>${v('maskapai')}</td>
+        <td>${v('reg')}</td><td>${v('tipe')}</td>
+        <td style="font-weight:700">${v('flt_arr')}</td><td>${v('sta')}</td>
+        <td style="${dA>0?'color:#D0021B;font-weight:700':''}">${v('ata')}${dA>0?' (+'+dA+')':''}</td>
+        <td>${n('pd')}</td><td>${n('pa')}</td><td>${n('pb')}</td>
+        <td style="font-weight:700">${arrT}</td><td>${n('bgs_a')}</td>
+        <td>${n('cgo_a')||'NIL'}</td><td>${v('remark')}</td>
       </tr></tbody>
     </table>
   </div>
 
-  <!-- FOOTER -->
-  <div style="background:#003580!important;padding:5px 16px;display:flex;justify-content:space-between;align-items:center;margin-top:8px;-webkit-print-color-adjust:exact">
+  <!-- TABEL DEPARTURE -->
+  <div style="padding:4px 16px 8px">
+    <div style="background:#1677FF;color:#fff;font-size:7pt;font-weight:700;padding:3px 6px;display:inline-block;margin-bottom:1px">DEPARTURE</div>
+    <table>
+      <thead><tr>
+        <th style="background:#1677FF">No</th><th style="background:#1677FF">Tanggal</th>
+        <th style="background:#1677FF">Route DEP</th><th style="background:#1677FF">AOC</th>
+        <th style="background:#1677FF">Reg</th><th style="background:#1677FF">Type AC</th>
+        <th style="background:#1677FF">Flt No</th><th style="background:#1677FF">STD (LT)</th>
+        <th style="background:#1677FF">ATD (LT)</th><th style="background:#1677FF">D</th>
+        <th style="background:#1677FF">A</th><th style="background:#1677FF">B</th>
+        <th style="background:#1677FF">Total</th><th style="background:#1677FF">Bagasi</th>
+        <th style="background:#1677FF">Kargo</th><th style="background:#1677FF">Remark</th>
+      </tr></thead>
+      <tbody><tr style="background:#F4F6FA">
+        <td>1</td><td>${v('tgl')}</td>
+        <td style="font-weight:700">${v('route_dep')}</td><td>${v('maskapai')}</td>
+        <td>${v('reg')}</td><td>${v('tipe')}</td>
+        <td style="font-weight:700">${v('flt_dep')}</td><td>${v('std')}</td>
+        <td style="${dD>0?'color:#D0021B;font-weight:700':''}">${v('atd')}${dD>0?' (+'+dD+')':''}</td>
+        <td>${n('dd')}</td><td>${n('da')}</td><td>${n('db')}</td>
+        <td style="font-weight:700">${depT}</td><td>${n('bgs_d')}</td>
+        <td>${n('cgo_d')||'NIL'}</td><td>${v('remark')}</td>
+      </tr></tbody>
+    </table>
+  </div>
+
+  <!-- FOOTER KONTAK SAJA -->
+  <div style="background:#003580;padding:5px 16px;display:flex;justify-content:space-between;align-items:center">
     <span style="font-size:7pt;color:rgba(255,255,255,0.75)">☎ 0852-2034-8115</span>
     <span style="font-size:7pt;color:rgba(255,255,255,0.75)">✉ aroeppalaairport@gmail.com</span>
     <span style="font-size:7pt;color:rgba(255,255,255,0.75)">Jl. Ahmad Dg. Marimba, Kab. Kepulauan Selayar, Sulawesi Selatan</span>
@@ -1054,15 +1082,14 @@ function cetakPDF() {
 </div>`;
 
   printDiv.style.display = 'block';
-  // Hide everything else
   document.querySelectorAll('body > *:not(#pdf-print)').forEach(e => e.style.display='none');
   setTimeout(()=>{
     window.print();
     setTimeout(()=>{
-      printDiv.style.display='none';
+      printDiv.style.display = 'none';
       document.querySelectorAll('body > *:not(#pdf-print)').forEach(e => e.style.display='');
-    },1000);
-  },300);
+    }, 1000);
+  }, 300);
 }
 
 
