@@ -819,11 +819,7 @@ function kirimKeAppsScript(payload) {
 
 // ── ANALISIS AI (Gemini) ──────────────────────────────────────
 async function analisisAI() {
-  if (!CFG.geminiKey) {
-    showNotif('Isi Gemini API Key dulu di Konfigurasi!', 'err');
-    openModal();
-    return;
-  }
+  if (!CFG.webAppUrl) { showNotif('Isi URL Web App di Konfigurasi dulu!', 'err'); openModal(); return; }
   if (!v('tgl')) { showNotif('Isi tanggal dulu!', 'err'); return; }
 
   const btn = el('btn-ai');
@@ -880,7 +876,6 @@ Balas HANYA dalam format JSON berikut tanpa teks lain:
       bgs_a: n('bgs_a'), bgs_d: n('bgs_d'),
       cgo_a: n('cgo_a'), cgo_d: n('cgo_d'),
       remark   : v('remark'),
-      gemini_key: CFG.geminiKey,
     });
 
     const resp = await fetch(CFG.webAppUrl + '?' + params.toString());
